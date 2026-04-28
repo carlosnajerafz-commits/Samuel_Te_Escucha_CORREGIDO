@@ -7,15 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN a2enmod rewrite
 
-# 🔥 IMPORTANTE: copiar desde raíz del proyecto
 COPY ./public /var/www/html
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
-
-RUN echo '<Directory /var/www/html>' > /etc/apache2/conf-available/app.conf \
-    && echo '    AllowOverride All' >> /etc/apache2/conf-available/app.conf \
-    && echo '    Require all granted' >> /etc/apache2/conf-available/app.conf \
-    && echo '    DirectoryIndex index.php index.html' >> /etc/apache2/conf-available/app.conf \
-    && echo '</Directory>' >> /etc/apache2/conf-available/app.conf \
-    && a2enconf app
