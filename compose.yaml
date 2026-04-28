@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  app:
+    build: ./docker/php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public:/var/www/html
+    depends_on:
+      - db
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: tecamac
+      POSTGRES_USER: tecamac_user
+      POSTGRES_PASSWORD: tecamac_pass
