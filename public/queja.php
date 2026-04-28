@@ -202,7 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="q-brand-logo"><img src="assets/img/logoguinda.jpeg" alt="Logo"></div>
         <div>
             <h2>Samuel Te Escucha</h2>
-            <span class="q-brand-sub">Oficina virtual</span>
+           
         </div>
     </a>
     <nav class="q-nav">

@@ -59,7 +59,7 @@ if (isset($_GET["ok"])) {
       </div>
       <div>
         <h2>Samuel Te Escucha</h2>
-        <span class="brand__sub">Oficina virtual</span>
+       
       </div>
     </div>
 
