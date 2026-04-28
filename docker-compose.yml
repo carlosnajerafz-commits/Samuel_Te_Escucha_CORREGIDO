@@ -3,8 +3,12 @@ services:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
-    ports:
-      - "80:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.samuel.rule=Host(`samuelteescucha.com`)"
+      - "traefik.http.routers.samuel.entrypoints=websecure"
+      - "traefik.http.routers.samuel.tls=true"
+      - "traefik.http.services.samuel.loadbalancer.server.port=80"
     depends_on:
       - db
     restart: always

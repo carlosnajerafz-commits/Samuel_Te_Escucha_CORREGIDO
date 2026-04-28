@@ -62,6 +62,13 @@ if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
 $evidenciaPath = null;
 
 if (isset($_FILES["evidencia"]) && $_FILES["evidencia"]["error"] === UPLOAD_ERR_OK) {
+    $maxSize = 5 * 1024 * 1024;
+
+    if ($_FILES["evidencia"]["size"] > $maxSize) {
+        header("Location: queja.php?error=1");
+        exit;
+    }
+
     $ext = strtolower(pathinfo($_FILES["evidencia"]["name"], PATHINFO_EXTENSION));
     $permitidas = ["jpg", "jpeg", "png", "webp"];
 
@@ -71,6 +78,7 @@ if (isset($_FILES["evidencia"]) && $_FILES["evidencia"]["error"] === UPLOAD_ERR_
     }
 
     $uploadDir = __DIR__ . "/uploads";
+
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
@@ -105,7 +113,7 @@ try {
                 municipio,
                 codigo_postal,
                 tipo,
-                direccion,
+                descripcion,
                 evidencia_path,
                 estatus
             ) VALUES (
@@ -123,12 +131,13 @@ try {
                 :municipio,
                 :codigo_postal,
                 :tipo,
-                :direccion,
+                :descripcion,
                 :evidencia_path,
                 :estatus
             )";
 
     $stmt = $pdo->prepare($sql);
+
     $stmt->execute([
         ":nombre" => $nombre,
         ":apellido_paterno" => $apellido_paterno,
@@ -144,7 +153,7 @@ try {
         ":municipio" => $municipio,
         ":codigo_postal" => $codigo_postal,
         ":tipo" => $tipo,
-        ":direccion" => $descripcion,
+        ":descripcion" => $descripcion,
         ":evidencia_path" => $evidenciaPath,
         ":estatus" => "pendiente"
     ]);
@@ -154,25 +163,5 @@ try {
 
 } catch (PDOException $e) {
     die("Error SQL en guardar_queja.php: " . $e->getMessage());
-}
-
-$maxSize = 5 * 1024 * 1024; // 5 MB
-$permitidas = ["jpg", "jpeg", "png", "webp"];
-
-if (!isset($_FILES["ine_foto"]) || $_FILES["ine_foto"]["error"] !== UPLOAD_ERR_OK) {
-    header("Location: cita.php?error=ine");
-    exit;
-}
-
-if ($_FILES["ine_foto"]["size"] > $maxSize) {
-    header("Location: cita.php?error=archivo_grande");
-    exit;
-}
-
-$ext = strtolower(pathinfo($_FILES["ine_foto"]["name"], PATHINFO_EXTENSION));
-
-if (!in_array($ext, $permitidas, true)) {
-    header("Location: cita.php?error=ine");
-    exit;
 }
 ?>
