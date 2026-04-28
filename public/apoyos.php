@@ -283,10 +283,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         
 
-        <div class="form-group">
-          <label>Municipio</label>
-          <input type="text" name="municipio" id="municipio" readonly required>
-        </div>
+
 
         <div class="form-group form-group--full">
           <label>Observaciones</label>
