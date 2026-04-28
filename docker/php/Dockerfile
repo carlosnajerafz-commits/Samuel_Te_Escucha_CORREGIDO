@@ -7,4 +7,10 @@ RUN apt-get update && apt-get install -y \
 
 RUN a2enmod rewrite
 
-RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+RUN echo '<Directory /var/www/html>' > /etc/apache2/conf-available/app.conf \
+    && echo '    Options Indexes FollowSymLinks' >> /etc/apache2/conf-available/app.conf \
+    && echo '    AllowOverride All' >> /etc/apache2/conf-available/app.conf \
+    && echo '    Require all granted' >> /etc/apache2/conf-available/app.conf \
+    && echo '    DirectoryIndex index.php index.html' >> /etc/apache2/conf-available/app.conf \
+    && echo '</Directory>' >> /etc/apache2/conf-available/app.conf \
+    && a2enconf app
