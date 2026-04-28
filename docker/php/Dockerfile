@@ -7,8 +7,15 @@ RUN apt-get update && apt-get install -y \
 
 RUN a2enmod rewrite
 
+# Copiar tu app dentro del contenedor
+COPY public/ /var/www/html/
+
+# Permisos
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# Apache config
 RUN echo '<Directory /var/www/html>' > /etc/apache2/conf-available/app.conf \
-    && echo '    Options Indexes FollowSymLinks' >> /etc/apache2/conf-available/app.conf \
     && echo '    AllowOverride All' >> /etc/apache2/conf-available/app.conf \
     && echo '    Require all granted' >> /etc/apache2/conf-available/app.conf \
     && echo '    DirectoryIndex index.php index.html' >> /etc/apache2/conf-available/app.conf \
