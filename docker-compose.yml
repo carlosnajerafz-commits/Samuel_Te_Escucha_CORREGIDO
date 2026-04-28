@@ -1,25 +1,16 @@
-version: '3.9'
+FROM php:8.2-apache
 
-services:
-  app:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
-    restart: always
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql pgsql \
+    && rm -rf /var/lib/apt/lists/*
 
-  db:
-    image: postgres:16
-    restart: always
-    environment:
-      POSTGRES_DB: tecamac
-      POSTGRES_USER: tecamac_user
-      POSTGRES_PASSWORD: tecamac_pass
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+RUN a2enmod rewrite
 
-volumes:
-  pgdata:
+COPY public/ /var/www/html/
+
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+RUN echo "DirectoryIndex index.php index.html" > /etc/apache2/conf-available/directory-index.conf \
+    && a2enconf directory-index
