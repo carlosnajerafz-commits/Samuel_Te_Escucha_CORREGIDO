@@ -69,7 +69,7 @@ $sqlQuejasPendientes = "
     SELECT id, nombre, apellido_paterno, apellido_materno,
            celular_1, celular_2, correo, seccion_electoral,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
-           tipo, direccion, evidencia_path, created_at, estatus
+         tipo, descripcion, evidencia_path, created_at, estatus
     FROM quejas
     WHERE estatus = 'pendiente'
       AND $condicionFecha
@@ -91,7 +91,7 @@ $sqlHistorialQuejas = "
     SELECT id, nombre, apellido_paterno, apellido_materno,
            celular_1, celular_2, correo, seccion_electoral,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
-           tipo, direccion, evidencia_path, created_at, estatus
+           tipo, descripcion, evidencia_path, created_at, estatus
     FROM quejas
     WHERE estatus IN ('atendida', 'cerrada', 'completada')
       AND $condicionFecha
@@ -300,7 +300,7 @@ $valuesEstatus = array_values($conteoEstatus);
             </div>
 
             <div style="margin-top:4px;color:#6b7280;">
-              Descripción: <?php echo htmlspecialchars($queja["direccion"] ?? ""); ?>
+              Descripción: <?php echo htmlspecialchars($queja["descripcion"] ?? ""); ?>
             </div>
 
             <?php if (!empty($queja["evidencia_path"])): ?>
