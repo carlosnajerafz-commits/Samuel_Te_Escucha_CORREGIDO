@@ -51,6 +51,42 @@ if (isset($_GET["ok"])) {
   </div>
 <?php endif; ?>
 
+<script>
+async function obtenerHorasOcupadas(fecha) {
+  try {
+    const res = await fetch(`horas_ocupadas.php?fecha=${fecha}`);
+    return await res.json();
+  } catch (e) {
+    return [];
+  }
+}
+
+async function actualizarHoras(fecha) {
+  const horasOcupadas = await obtenerHorasOcupadas(fecha);
+
+  document.querySelectorAll(".hora-btn").forEach(btn => {
+    const hora = btn.dataset.hora;
+
+    if (horasOcupadas.includes(hora)) {
+      btn.disabled = true;
+      btn.style.opacity = "0.5";
+      btn.style.cursor = "not-allowed";
+      btn.title = "Hora ocupada";
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
+      btn.title = "";
+    }
+  });
+}
+
+/* cuando cambie la fecha */
+document.getElementById("fecha").addEventListener("change", function () {
+  actualizarHoras(this.value);
+});
+</script>
+
 <header class="topbar">
   <div class="wrap topbar__inner">
     <div class="brand">
@@ -346,40 +382,109 @@ if (isset($_GET["ok"])) {
 </footer>
 
 <script src="assets/js/cita-calendar.js"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+
+  /* =========================
+     CÓDIGO POSTAL
+  ========================= */
   const codigoPostal = document.getElementById("codigo_postal");
   const coloniaSelect = document.getElementById("colonia");
   const municipioInput = document.getElementById("municipio");
 
-  codigoPostal.addEventListener("change", function () {
-    const cp = this.value.trim();
+  if (codigoPostal) {
+    codigoPostal.addEventListener("change", function () {
+      const cp = this.value.trim();
 
-    coloniaSelect.innerHTML = "<option value=''>Seleccione una colonia</option>";
-    municipioInput.value = "";
+      coloniaSelect.innerHTML = "<option value=''>Seleccione una colonia</option>";
+      municipioInput.value = "";
 
-    if (cp.length !== 5) {
-      return;
+      if (cp.length !== 5) return;
+
+      fetch("buscar_cp.php?cp=" + encodeURIComponent(cp))
+        .then(res => res.json())
+        .then(data => {
+          if (data.colonias && data.colonias.length > 0) {
+            data.colonias.forEach(colonia => {
+              const option = document.createElement("option");
+              option.value = colonia;
+              option.textContent = colonia;
+              coloniaSelect.appendChild(option);
+            });
+
+            municipioInput.value = data.municipio || "";
+          }
+        })
+        .catch(err => console.error("Error CP:", err));
+    });
+  }
+
+  /* =========================
+     HORAS OCUPADAS
+  ========================= */
+  async function obtenerHorasOcupadas(fecha) {
+    try {
+      const res = await fetch(`horas_ocupadas.php?fecha=${encodeURIComponent(fecha)}`);
+      return await res.json();
+    } catch (e) {
+      console.error("Error horas:", e);
+      return [];
     }
+  }
 
-    fetch("buscar_cp.php?cp=" + encodeURIComponent(cp))
-      .then(response => response.json())
-      .then(data => {
-        if (data.colonias && data.colonias.length > 0) {
-          data.colonias.forEach(colonia => {
-            const option = document.createElement("option");
-            option.value = colonia;
-            option.textContent = colonia;
-            coloniaSelect.appendChild(option);
-          });
+  async function actualizarHoras(fecha) {
+    const horasOcupadas = await obtenerHorasOcupadas(fecha);
 
-          municipioInput.value = data.municipio || "";
+    document.querySelectorAll(".slot-btn").forEach(btn => {
+      const hora = btn.dataset.slot;
+
+      if (horasOcupadas.includes(hora) || horasOcupadas.includes(hora + ":00")) {
+        btn.disabled = true;
+        btn.classList.remove("selected");
+        btn.style.opacity = "0.45";
+        btn.style.cursor = "not-allowed";
+        btn.title = "Hora ocupada";
+
+        if (document.getElementById("horaInput").value === hora) {
+          document.getElementById("horaInput").value = "";
         }
-      })
-      .catch(error => {
-        console.error("Error al buscar código postal:", error);
-      });
-  });
+
+      } else {
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+        btn.title = "";
+      }
+    });
+  }
+
+  /* =========================
+     DETECTAR CAMBIO DE FECHA
+  ========================= */
+  const fechaInput = document.getElementById("fechaInput");
+
+  if (fechaInput) {
+
+    // cuando cambia valor manualmente
+    fechaInput.addEventListener("change", () => {
+      actualizarHoras(fechaInput.value);
+    });
+
+    // cuando lo cambia el calendario (esto es CLAVE en tu caso)
+    const observer = new MutationObserver(() => {
+      if (fechaInput.value) {
+        actualizarHoras(fechaInput.value);
+      }
+    });
+
+    observer.observe(fechaInput, {
+      attributes: true,
+      attributeFilter: ["value"]
+    });
+
+  }
+
 });
 </script>
 </body>

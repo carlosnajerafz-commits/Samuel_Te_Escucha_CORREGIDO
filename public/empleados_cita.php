@@ -243,38 +243,44 @@ $valuesHoras = array_values($conteoHoras);
     </div>
   </section>
 
-  <section class="dashboard-card" style="margin-top:22px;">
-    <h2>Citas aceptadas</h2>
-    <div class="list" style="margin-top:18px;">
-      <?php if (empty($citasAceptadas)): ?>
+ <section class="dashboard-card" style="margin-top:22px;">
+  <h2>Solicitudes de cita</h2>
+  <div class="list" style="margin-top:18px;">
+
+    <?php if (empty($solicitudesCita)): ?>
+      <div class="list-item">
+        <strong>Sin solicitudes</strong>
+        <div>No hay solicitudes pendientes.</div>
+      </div>
+    <?php else: ?>
+
+      <?php foreach ($solicitudesCita as $cita): ?>
         <div class="list-item">
-          <strong>Sin citas aceptadas</strong>
-          <div>No hay citas activas.</div>
-        </div>
-      <?php else: ?>
-        <?php foreach ($citasAceptadas as $cita): ?>
-          <div class="list-item">
-            <strong>
-              <?php echo htmlspecialchars(($cita["nombre"] ?? "") . " " . ($cita["apellido_paterno"] ?? "") . " " . ($cita["apellido_materno"] ?? "")); ?>
-            </strong>
+          <strong>
+            <?php echo htmlspecialchars(($cita["nombre"] ?? "") . " " . ($cita["apellido_paterno"] ?? "") . " " . ($cita["apellido_materno"] ?? "")); ?>
+          </strong>
 
-            <div style="margin-top:6px;color:#6b7280;">
-              Fecha: <?php echo htmlspecialchars($cita["fecha"] ?? ""); ?> · Hora: <?php echo htmlspecialchars(substr((string)($cita["hora"] ?? ""), 0, 5)); ?>
-            </div>
+          <div style="margin-top:6px;color:#6b7280;">
+            Fecha: <?php echo htmlspecialchars($cita["fecha"] ?? ""); ?> · Hora: <?php echo htmlspecialchars(substr((string)($cita["hora"] ?? ""), 0, 5)); ?>
+          </div>
 
+          <div style="margin-top:4px;color:#6b7280;">
+            Celular 1: <?php echo htmlspecialchars($cita["celular_1"] ?? ""); ?>
+          </div>
+
+          <div style="margin-top:4px;color:#6b7280;">
+            Celular 2: <?php echo htmlspecialchars($cita["celular_2"] ?? ""); ?>
+          </div>
+
+          <div style="margin-top:4px;color:#6b7280;">
+            Correo: <?php echo htmlspecialchars($cita["correo"] ?? ""); ?>
+          </div>
+
+          <?php if (!empty($cita["motivo"])): ?>
             <div style="margin-top:4px;color:#6b7280;">
-              Celular 1: <?php echo htmlspecialchars($cita["celular_1"] ?? ""); ?>
+              Motivo: <?php echo htmlspecialchars($cita["motivo"]); ?>
             </div>
-
-            <div style="margin-top:4px;color:#6b7280;">
-              Correo: <?php echo htmlspecialchars($cita["correo"] ?? ""); ?>
-            </div>
-
-            <?php if (!empty($cita["motivo"])): ?>
-              <div style="margin-top:4px;color:#6b7280;">
-                Motivo: <?php echo htmlspecialchars($cita["motivo"]); ?>
-              </div>
-            <?php endif; ?>
+          <?php endif; ?>
 
             <?php if (!empty($cita["ine_path"])): ?>
               <div style="margin-top:8px;">

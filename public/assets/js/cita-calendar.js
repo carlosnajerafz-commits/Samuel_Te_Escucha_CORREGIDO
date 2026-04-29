@@ -159,3 +159,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderCalendar();
 });
+
+async function obtenerHorasOcupadas(fecha) {
+  try {
+    const res = await fetch(`horas_ocupadas.php?fecha=${fecha}`);
+    return await res.json();
+  } catch (e) {
+    return [];
+  }
+}
