@@ -259,12 +259,23 @@ $valuesHoras = array_values($conteoHoras);
               </div>
             <?php endif; ?>
 
-            <?php if (!empty($cita["ine_path"])): ?>
-              <div style="margin-top:8px;">
-                <a href="<?php echo htmlspecialchars($cita["ine_path"]); ?>" target="_blank" class="btn btn--light">Ver INE</a>
-              </div>
-            <?php endif; ?>
+        <?php if (!empty($cita["ine_path"])): ?>
+  <?php
+    $ineUrl = $cita["ine_path"];
 
+    if (strpos($ineUrl, "uploads/") !== 0) {
+        $ineUrl = "uploads/" . $ineUrl;
+    }
+
+    $ineUrl = "/" . ltrim($ineUrl, "/");
+  ?>
+
+  <div style="margin-top:8px;">
+    <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">
+      Ver INE
+    </a>
+  </div>
+<?php endif; ?>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
               <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
                 <input type="hidden" name="id" value="<?php echo (int)($cita["id"] ?? 0); ?>">
