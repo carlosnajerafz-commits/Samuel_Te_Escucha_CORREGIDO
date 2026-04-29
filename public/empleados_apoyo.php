@@ -317,9 +317,10 @@ $valuesEstatus = array_values($conteoEstatus);
               </div>
             <?php endif; ?>
 
-        <?php if (!empty($registro["ine_path"])): ?>
-  <?php $ineUrl = "/" . ltrim($registro["ine_path"], "/"); ?>
-
+       <?php if (!empty($registro["ine_path"])): ?>
+  <?php
+    $ineUrl = "/" . ltrim($registro["ine_path"], "/");
+  ?>
   <div style="margin-top:8px;">
     <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">
       Ver INE

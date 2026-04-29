@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="carousel__overlay"></div>
     </div>
 
-    <div class="carousel__slide" style="background-image:url('assets/img/Mariela.jpeg');">
+    <div class="carousel__slide" style="background-image:url('assets/img/juntos.png');">
       <div class="carousel__overlay"></div>
     </div>
 
