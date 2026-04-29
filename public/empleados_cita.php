@@ -66,85 +66,97 @@ if (isset($_GET["ok"])) {
 }
 
 /* =========================================
-   CONSULTAR APOYOS ACTIVOS
+   CONSULTAR SOLICITUDES DE CITA
 ========================================= */
-$sqlApoyos = "
-    SELECT id, nombre, descripcion, activo, created_at
-    FROM apoyos
-    WHERE activo = TRUE
-    ORDER BY created_at DESC
-";
-$stmtApoyos = $pdo->query($sqlApoyos);
-$apoyosActivos = $stmtApoyos->fetchAll(PDO::FETCH_ASSOC);
-
-if (!$apoyosActivos) {
-    $apoyosActivos = [];
-}
-
-/* =========================================
-   CONSULTAR REGISTROS DE APOYOS
-========================================= */
-$sqlRegistrosApoyos = "
-    SELECT id, apoyo, nombre, apellido_paterno, apellido_materno,
+$sqlSolicitudes = "
+    SELECT id, nombre, apellido_paterno, apellido_materno,
            celular_1, celular_2, correo, seccion_electoral,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
-           observaciones, estatus, created_at, ine_path
-    FROM registros_apoyos
-    WHERE $condicionFecha
+           fecha, hora, motivo, ine_path, estatus, created_at
+    FROM citas
+    WHERE estatus = 'solicitada'
+      AND $condicionFecha
       $condicionBusqueda
-    ORDER BY created_at DESC
+    ORDER BY fecha ASC, hora ASC
 ";
 
-$stmtRegistrosApoyos = $pdo->prepare($sqlRegistrosApoyos);
-$stmtRegistrosApoyos->execute($paramsBusqueda);
-$registrosApoyos = $stmtRegistrosApoyos->fetchAll(PDO::FETCH_ASSOC);
-
-if (!$registrosApoyos) {
-    $registrosApoyos = [];
-}
+$stmtSolicitudes = $pdo->prepare($sqlSolicitudes);
+$stmtSolicitudes->execute($paramsBusqueda);
+$solicitudesCita = $stmtSolicitudes->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
 /* =========================================
-   DATOS PARA GRÁFICAS
+   CONSULTAR CITAS ACEPTADAS
 ========================================= */
-$conteoApoyos = [];
-$conteoMunicipios = [];
+$sqlCitasAceptadas = "
+    SELECT id, nombre, apellido_paterno, apellido_materno,
+           celular_1, celular_2, correo, seccion_electoral,
+           calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
+           fecha, hora, motivo, ine_path, estatus, created_at
+    FROM citas
+    WHERE estatus = 'aceptada'
+      AND $condicionFecha
+      $condicionBusqueda
+    ORDER BY fecha ASC, hora ASC
+";
+
+$stmtCitasAceptadas = $pdo->prepare($sqlCitasAceptadas);
+$stmtCitasAceptadas->execute($paramsBusqueda);
+$citasAceptadas = $stmtCitasAceptadas->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+/* =========================================
+   CONSULTAR HISTORIAL DE CITAS
+========================================= */
+$sqlHistorialCitas = "
+    SELECT id, nombre, apellido_paterno, apellido_materno,
+           celular_1, celular_2, correo, seccion_electoral,
+           calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
+           fecha, hora, motivo, ine_path, estatus, created_at
+    FROM citas
+    WHERE estatus IN ('rechazada', 'realizada', 'cancelada', 'vencida')
+      AND $condicionFecha
+      $condicionBusqueda
+    ORDER BY fecha DESC, hora DESC
+";
+
+$stmtHistorialCitas = $pdo->prepare($sqlHistorialCitas);
+$stmtHistorialCitas->execute($paramsBusqueda);
+$historialCitas = $stmtHistorialCitas->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+/* =========================================
+   DATOS PARA GRÁFICAS DE CITAS
+========================================= */
 $conteoEstatus = [];
+$conteoMunicipios = [];
+$conteoHoras = [];
 
-foreach ($registrosApoyos as $registro) {
-    $apoyo = trim($registro["apoyo"] ?? "");
-    $municipio = trim($registro["municipio"] ?? "");
-    $estatus = trim($registro["estatus"] ?? "");
+$todasLasCitas = array_merge($solicitudesCita, $citasAceptadas, $historialCitas);
 
-    if ($apoyo !== "") {
-        if (!isset($conteoApoyos[$apoyo])) {
-            $conteoApoyos[$apoyo] = 0;
-        }
-        $conteoApoyos[$apoyo]++;
+foreach ($todasLasCitas as $cita) {
+    $estatus = trim($cita["estatus"] ?? "");
+    $municipio = trim($cita["municipio"] ?? "");
+    $hora = substr((string)($cita["hora"] ?? ""), 0, 5);
+
+    if ($estatus !== "") {
+        $conteoEstatus[$estatus] = ($conteoEstatus[$estatus] ?? 0) + 1;
     }
 
     if ($municipio !== "") {
-        if (!isset($conteoMunicipios[$municipio])) {
-            $conteoMunicipios[$municipio] = 0;
-        }
-        $conteoMunicipios[$municipio]++;
+        $conteoMunicipios[$municipio] = ($conteoMunicipios[$municipio] ?? 0) + 1;
     }
 
-    if ($estatus !== "") {
-        if (!isset($conteoEstatus[$estatus])) {
-            $conteoEstatus[$estatus] = 0;
-        }
-        $conteoEstatus[$estatus]++;
+    if ($hora !== "") {
+        $conteoHoras[$hora] = ($conteoHoras[$hora] ?? 0) + 1;
     }
 }
 
-$labelsApoyos = array_keys($conteoApoyos);
-$valuesApoyos = array_values($conteoApoyos);
+$labelsEstatus = array_keys($conteoEstatus);
+$valuesEstatus = array_values($conteoEstatus);
 
 $labelsMunicipios = array_keys($conteoMunicipios);
 $valuesMunicipios = array_values($conteoMunicipios);
 
-$labelsEstatus = array_keys($conteoEstatus);
-$valuesEstatus = array_values($conteoEstatus);
+$labelsHoras = array_keys($conteoHoras);
+$valuesHoras = array_values($conteoHoras);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -182,7 +194,7 @@ $valuesEstatus = array_values($conteoEstatus);
   <input 
     type="text" 
     name="buscar" 
-    placeholder="Buscar por apoyo, nombre, correo, celular, municipio..."
+   placeholder="Buscar por nombre, correo, celular, municipio..."
     value="<?php echo htmlspecialchars($_GET['buscar'] ?? ''); ?>"
     style="width:100%; max-width:420px; padding:10px 14px; border:1px solid #ccc; border-radius:10px;"
   >
@@ -191,7 +203,7 @@ $valuesEstatus = array_values($conteoEstatus);
 
   <button type="submit" class="btn">Buscar</button>
 
-  <a href="empleados_apoyo.php?filtro=<?php echo urlencode($filtro); ?>" class="btn btn--light">
+  <a href="empleados_cita.php?filtro=<?php echo urlencode($filtro); ?>" class="btn btn--light">
     Limpiar
   </a>
 </form>
