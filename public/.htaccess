@@ -1,8 +1,10 @@
-DirectoryIndex index.php index.html
-
-Options -Indexes
-
 RewriteEngine On
+
+# 🔴 IMPORTANTE: NO tocar uploads
+RewriteCond %{REQUEST_URI} ^/uploads/
+RewriteRule ^ - [L]
+
+# Si el archivo NO existe, manda a index
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [L]

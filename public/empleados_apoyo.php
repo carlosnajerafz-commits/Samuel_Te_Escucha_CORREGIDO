@@ -318,15 +318,8 @@ $valuesEstatus = array_values($conteoEstatus);
             <?php endif; ?>
 
            <?php if (!empty($registro["ine_path"])): ?>
-  <?php
-    $ineUrl = $registro["ine_path"];
-
-    if (strpos($ineUrl, "uploads/") !== 0) {
-        $ineUrl = "uploads/" . $ineUrl;
-    }
-
-    $ineUrl = "/" . ltrim($ineUrl, "/");
-  ?>
+<?php if (!empty($registro["ine_path"])): ?>
+  <?php $ineUrl = "/" . ltrim($registro["ine_path"], "/"); ?>
 
   <div style="margin-top:8px;">
     <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">

@@ -260,15 +260,8 @@ $valuesHoras = array_values($conteoHoras);
             <?php endif; ?>
 
         <?php if (!empty($cita["ine_path"])): ?>
-  <?php
-    $ineUrl = $cita["ine_path"];
-
-    if (strpos($ineUrl, "uploads/") !== 0) {
-        $ineUrl = "uploads/" . $ineUrl;
-    }
-
-    $ineUrl = "/" . ltrim($ineUrl, "/");
-  ?>
+<?php if (!empty($cita["ine_path"])): ?>
+  <?php $ineUrl = "/" . ltrim($cita["ine_path"], "/"); ?>
 
   <div style="margin-top:8px;">
     <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">
