@@ -35,7 +35,7 @@ $sqlActualizarVencidas = "
     WHERE estatus = 'aceptada'
       AND (
         fecha < CURRENT_DATE
-        OR (fecha = CURRENT_DATE AND hora < CURRENT_TIME)
+        OR (fecha = CURRENT_DATE AND hora < CURRENT_TIME::time)
       )
 ";
 $pdo->exec($sqlActualizarVencidas);
@@ -91,7 +91,7 @@ $sqlQuejasPendientes = "
     SELECT id, nombre, apellido_paterno, apellido_materno,
            celular_1, celular_2, correo, seccion_electoral,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
-           tipo, direccion, evidencia_path, created_at, estatus
+           tipo, descripcion, evidencia_path, created_at, estatus
     FROM quejas
     WHERE estatus = 'pendiente'
     ORDER BY created_at DESC
@@ -109,7 +109,7 @@ $sqlHistorialQuejas = "
     SELECT id, nombre, apellido_paterno, apellido_materno,
            celular_1, celular_2, correo, seccion_electoral,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
-           tipo, direccion, evidencia_path, created_at, estatus
+          tipo, descripcion, evidencia_path, created_at, estatus
     FROM quejas
     WHERE estatus IN ('atendida', 'cerrada', 'completada')
     ORDER BY created_at DESC
@@ -392,7 +392,7 @@ $apoyosActivos = $stmtApoyos->fetchAll();
 </div>
 
 <div style="margin-top:4px;color:#6b7280;">
-  Descripción: <?php echo htmlspecialchars($queja["direccion"] ?? ""); ?>
+ Descripción: <?php echo htmlspecialchars($queja["descripcion"] ?? ""); ?>
 </div>
 
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
