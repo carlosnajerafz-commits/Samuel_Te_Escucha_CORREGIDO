@@ -398,7 +398,7 @@ $valuesEstatus = array_values($conteoEstatus);
             </div>
 
             <div style="margin-top:4px;color:#6b7280;">
-              Descripción: <?php echo htmlspecialchars($queja["direccion"] ?? ""); ?>
+              Descripción: <?php echo htmlspecialchars($queja["descripcion"] ?? ""); ?>
             </div>
 
             <?php if (!empty($queja["evidencia_path"])): ?>
