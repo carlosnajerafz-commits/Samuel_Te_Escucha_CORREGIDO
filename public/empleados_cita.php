@@ -323,7 +323,8 @@ $valuesHoras = array_values($conteoHoras);
 
             <?php if (!empty($cita["ine_path"])): ?>
               <div style="margin-top:8px;">
-                <a href="<?php echo htmlspecialchars($cita["ine_path"]); ?>" target="_blank" class="btn btn--light">Ver INE</a>
+                <?php $ineUrl = "/" . ltrim($cita["ine_path"], "/"); ?>
+<a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">Ver INE</a>
               </div>
             <?php endif; ?>
 
