@@ -554,7 +554,7 @@ $apoyosActivos = $stmtApoyos->fetchAll();
 </div>
 
 <div style="margin-top:4px;color:#6b7280;">
-  Descripción: <?php echo htmlspecialchars($queja["direccion"] ?? ""); ?>
+  Descripción: <?php echo htmlspecialchars($queja["descripcion"] ?? ""); ?>
 </div>
 
             <div style="margin-top:8px;">
@@ -687,10 +687,22 @@ $apoyosActivos = $stmtApoyos->fetchAll();
           <?php endif; ?>
 
           <?php if (!empty($registro["ine_path"])): ?>
-            <div style="margin-top:8px;">
-              <a href="<?php echo htmlspecialchars($registro["ine_path"]); ?>" target="_blank" class="btn btn--light">Ver INE</a>
-            </div>
-          <?php endif; ?>
+  <?php
+    $ineUrl = $registro["ine_path"];
+
+    if (strpos($ineUrl, "uploads/") !== 0) {
+        $ineUrl = "uploads/" . $ineUrl;
+    }
+
+    $ineUrl = "/" . ltrim($ineUrl, "/");
+  ?>
+
+  <div style="margin-top:8px;">
+    <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">
+      Ver INE
+    </a>
+  </div>
+<?php endif; ?>
 
           <div style="margin-top:8px;">
             <strong style="display:inline;color:#7A1737;">Estatus:</strong>
