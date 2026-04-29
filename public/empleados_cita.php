@@ -243,7 +243,7 @@ $valuesHoras = array_values($conteoHoras);
     </div>
   </section>
 
- <section class="dashboard-card" style="margin-top:22px;">
+<section class="dashboard-card" style="margin-top:22px;">
   <h2>Solicitudes de cita</h2>
   <div class="list" style="margin-top:18px;">
 
@@ -282,31 +282,34 @@ $valuesHoras = array_values($conteoHoras);
             </div>
           <?php endif; ?>
 
-            <?php if (!empty($cita["ine_path"])): ?>
-              <div style="margin-top:8px;">
-                <?php $ineUrl = "/" . ltrim($cita["ine_path"], "/"); ?>
-<a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">Ver INE</a>
-              </div>
-            <?php endif; ?>
-
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
-              <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
-                <input type="hidden" name="id" value="<?php echo (int)($cita["id"] ?? 0); ?>">
-                <input type="hidden" name="estatus" value="realizada">
-                <button type="submit" class="btn">Marcar realizada</button>
-              </form>
-
-              <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
-                <input type="hidden" name="id" value="<?php echo (int)($cita["id"] ?? 0); ?>">
-                <input type="hidden" name="estatus" value="cancelada">
-                
-              </form>
+          <?php if (!empty($cita["ine_path"])): ?>
+            <?php $ineUrl = "/" . ltrim($cita["ine_path"], "/"); ?>
+            <div style="margin-top:8px;">
+              <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">Ver INE</a>
             </div>
+          <?php endif; ?>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+            <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+              <input type="hidden" name="id" value="<?php echo (int)($cita["id"] ?? 0); ?>">
+              <input type="hidden" name="estatus" value="aceptada">
+              <button type="submit" class="btn">Aceptar</button>
+            </form>
+
+            <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+              <input type="hidden" name="id" value="<?php echo (int)($cita["id"] ?? 0); ?>">
+              <input type="hidden" name="estatus" value="rechazada">
+              <button type="submit" class="btn btn--light">Rechazar</button>
+            </form>
           </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    </div>
-  </section>
+        </div>
+      <?php endforeach; ?>
+
+    <?php endif; ?>
+
+  </div>
+</section>
+    
 
   <section class="dashboard-card" style="margin-top:22px;">
     <div class="calendar-head">
