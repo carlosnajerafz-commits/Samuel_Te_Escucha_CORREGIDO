@@ -209,39 +209,7 @@ $valuesHoras = array_values($conteoHoras);
 </form>
 
 
-            <?php if (!empty($cita["motivo"])): ?>
-              <div style="margin-top:4px;color:#6b7280;">
-                Motivo: <?php echo htmlspecialchars($cita["motivo"]); ?>
-              </div>
-            <?php endif; ?>
-
-<?php if (!empty($cita["ine_path"])): ?>
-  <?php $ineUrl = "/" . ltrim($cita["ine_path"], "/"); ?>
-
-  <div style="margin-top:8px;">
-    <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">
-      Ver INE
-    </a>
-  </div>
-<?php endif; ?>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
-              <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
-                <input type="hidden" name="id" value="<?php echo (int)($cita["id"] ?? 0); ?>">
-                <input type="hidden" name="estatus" value="aceptada">
-                <button type="submit" class="btn">Aceptar</button>
-              </form>
-
-              <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
-                <input type="hidden" name="id" value="<?php echo (int)($cita["id"] ?? 0); ?>">
-                <input type="hidden" name="estatus" value="rechazada">
-                <button type="submit" class="btn btn--light">Rechazar</button>
-              </form>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    </div>
-  </section>
+ 
 
 <section class="dashboard-card" style="margin-top:22px;">
   <h2>Solicitudes de cita</h2>
@@ -346,11 +314,12 @@ $valuesHoras = array_values($conteoHoras);
               <?php echo htmlspecialchars($cita["estatus"] ?? ""); ?>
             </div>
 
-            <?php if (!empty($cita["ine_path"])): ?>
-              <div style="margin-top:8px;">
-                <a href="<?php echo htmlspecialchars($cita["ine_path"]); ?>" target="_blank" class="btn btn--light">Ver INE</a>
-              </div>
-            <?php endif; ?>
+         <?php if (!empty($cita["ine_path"])): ?>
+  <?php $ineUrl = "/" . ltrim($cita["ine_path"], "/"); ?>
+  <div style="margin-top:8px;">
+    <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">Ver INE</a>
+  </div>
+<?php endif; ?>
 
             <div style="margin-top:12px;">
               <form method="POST" action="eliminar_cita.php" onsubmit="return confirm('¿Seguro que deseas eliminar esta cita?');">

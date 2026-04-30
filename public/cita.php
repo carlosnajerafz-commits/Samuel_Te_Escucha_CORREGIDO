@@ -6,11 +6,21 @@ $modalTipo = "";
 
 if (isset($_GET["ok"])) {
     $mostrarModal = true;
-    $modalTitulo = "Solicitud enviada";
-    $modalMensaje = "Tu solicitud de cita fue registrada con éxito y, en breve, nos pondremos en contacto vía telefónica para confirmarla.";
-    $modalTipo = "success";
+    $modalTitulo = "Tu solicitud de cita fue registrada con éxito y, en breve, nos pondremos en contacto vía telefónica para confirmarla.x";
 
-} elseif (isset($_GET["error"])) {
+    $id = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
+
+    // opcional: folio bonito
+    $folio = str_pad($id, 6, "0", STR_PAD_LEFT);
+
+    $modalMensaje = "¡Registro exitoso!
+
+Tu número de folio es: #" . $folio . "
+
+Tu solicitud ha sido recibida. Nos pondremos en contacto contigo.";
+
+    $modalTipo = "success";
+}
 
     $mostrarModal = true;
     $modalTitulo = "Error";
@@ -39,6 +49,28 @@ if (isset($_GET["ok"])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Solicitar Cita | Samuel Te Escucha</title>
   <link rel="stylesheet" href="assets/css/styles.css">
+<link rel="stylesheet" href="assets/css/cita.css?v=3">
+
+  <style>
+@media (max-width: 768px) {
+  #calendarGrid {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  #calendarGrid .calendar-day-ui,
+  #calendarGrid button,
+  #calendarGrid div {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    padding: 6px !important;
+  }
+}
+</style>
 </head>
 <body>
 

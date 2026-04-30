@@ -131,8 +131,10 @@ try {
         ":ine_path" => $inePath
     ]);
 
-    header("Location: cita.php?ok=1");
-    exit;
+    $id = $pdo->lastInsertId();
+
+header("Location: cita.php?ok=1&id=" . $id);
+exit;
 
 } catch (PDOException $e) {
     header("Location: cita.php?error=general");

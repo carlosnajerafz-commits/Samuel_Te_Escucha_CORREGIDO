@@ -148,8 +148,10 @@ try {
         ":estatus" => "registrado"
     ]);
 
-    header("Location: apoyos.php?ok=1");
-    exit;
+    $id = $pdo->lastInsertId();
+
+header("Location: apoyos.php?ok=1&id=" . $id);
+exit;
 
 } catch (PDOException $e) {
     die("Error SQL en guardar_apoyo.php: " . $e->getMessage());

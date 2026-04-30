@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta name="description" content="Samuel Te Escucha: plataforma ciudadana para solicitar citas, apoyos y enviar quejas.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://samuelteescucha.com/">
   <title>Samuel Te Escucha</title>
 
   <!-- CSS GENERAL -->

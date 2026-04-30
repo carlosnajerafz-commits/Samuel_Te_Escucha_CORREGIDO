@@ -6,8 +6,35 @@ $modalTipo = "";
 
 if (isset($_GET["ok"])) {
     $mostrarModal = true;
-    $modalTitulo = "Queja registrada";
-    $modalMensaje = "Tu queja fue registrada correctamente.";
+    $modalTitulo = "Solicitud enviada";
+
+    $id = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
+
+    // opcional: folio bonito
+    $folio = str_pad($id, 6, "0", STR_PAD_LEFT);
+
+    $modalMensaje = "¡Registro exitoso!
+
+Tu número de folio es: #" . $folio . "
+
+Tu solicitud ha sido recibida. Nos pondremos en contacto contigo.";
+
+    $modalTipo = "success";
+}if (isset($_GET["ok"])) {
+    $mostrarModal = true;
+    $modalTitulo = "Solicitud enviada";
+
+    $id = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
+
+    // opcional: folio bonito
+    $folio = str_pad($id, 6, "0", STR_PAD_LEFT);
+
+    $modalMensaje = "¡Registro exitoso!
+
+Tu número de folio es: #" . $folio . "
+
+Tu solicitud ha sido recibida. Nos pondremos en contacto contigo.";
+
     $modalTipo = "success";
 }
 
