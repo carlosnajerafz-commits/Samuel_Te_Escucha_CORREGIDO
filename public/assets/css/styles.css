@@ -1733,3 +1733,10 @@ select:focus{
     min-height: 54px !important;
   }
 }
+.slot-btn.disabled,
+.slot-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #e5e7eb;
+  color: #6b7280;
+}

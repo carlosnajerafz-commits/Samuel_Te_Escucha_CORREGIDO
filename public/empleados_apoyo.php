@@ -277,6 +277,10 @@ $valuesEstatus = array_values($conteoEstatus);
               ?>
             </strong>
 
+            <div style="margin-bottom:8px;font-size:14px;font-weight:800;color:#7A1737;">
+  Folio: APOYO-<?php echo str_pad((string)($registro["id"] ?? 0), 6, "0", STR_PAD_LEFT); ?>
+</div>
+
             <div style="margin-top:6px;">
               <strong style="display:inline;color:#7A1737;">Apoyo:</strong>
               <?php echo htmlspecialchars($registro["apoyo"] ?? ""); ?>

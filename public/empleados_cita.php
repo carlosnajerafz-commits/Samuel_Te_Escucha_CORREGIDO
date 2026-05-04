@@ -210,7 +210,7 @@ $valuesHoras = array_values($conteoHoras);
 
 
  
-
+<main class="wrap dashboard"> 
 <section class="dashboard-card" style="margin-top:22px;">
   <h2>Solicitudes de cita</h2>
   <div class="list" style="margin-top:18px;">
@@ -222,7 +222,9 @@ $valuesHoras = array_values($conteoHoras);
       </div>
     <?php else: ?>
 
-      <?php foreach ($solicitudesCita as $cita): ?>
+    <div style="margin-bottom:8px;font-size:14px;font-weight:800;color:#7A1737;">
+  Folio: CITA-<?php echo str_pad((string)($cita["id"] ?? 0), 6, "0", STR_PAD_LEFT); ?>
+</div>
         <div class="list-item">
           <strong>
             <?php echo htmlspecialchars(($cita["nombre"] ?? "") . " " . ($cita["apellido_paterno"] ?? "") . " " . ($cita["apellido_materno"] ?? "")); ?>
@@ -251,9 +253,9 @@ $valuesHoras = array_values($conteoHoras);
           <?php endif; ?>
 
           <?php if (!empty($cita["ine_path"])): ?>
-            <?php $ineUrl = "/" . ltrim($cita["ine_path"], "/"); ?>
+            <?php $ineUrl = ltrim($cita["ine_path"], "/");?>
             <div style="margin-top:8px;">
-              <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">Ver INE</a>
+             <a href="<?php echo htmlspecialchars($ineUrl); ?>" target="_blank" class="btn btn--light">Ver INE</a>
             </div>
           <?php endif; ?>
 

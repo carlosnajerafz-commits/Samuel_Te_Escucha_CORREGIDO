@@ -10,14 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const horaInput = document.getElementById("horaInput");
   const form = document.getElementById("citaForm");
 
-  const meses = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-  ];
-
-  const diasLargos = [
-    "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"
-  ];
+  const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const diasLargos = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
 
   let currentDate = new Date();
   let selectedDate = null;
@@ -30,20 +24,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function formatDateReadable(date) {
-    const dayName = diasLargos[date.getDay()];
-    const day = date.getDate();
-    const month = meses[date.getMonth()];
-    const year = date.getFullYear();
-    return `${dayName} ${day} de ${month} de ${year}`;
+    return `${diasLargos[date.getDay()]} ${date.getDate()} de ${meses[date.getMonth()]} de ${date.getFullYear()}`;
   }
 
   function isPastDay(date) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const compare = new Date(date);
     compare.setHours(0, 0, 0, 0);
-
     return compare < today;
   }
 
@@ -55,6 +43,36 @@ document.addEventListener("DOMContentLoaded", () => {
     horaInput.value = "";
     document.querySelectorAll(".slot-btn").forEach(btn => {
       btn.classList.remove("active");
+    });
+  }
+
+  async function obtenerHorasOcupadas(fecha) {
+    try {
+      const res = await fetch(`horas_ocupadas.php?fecha=${encodeURIComponent(fecha)}`);
+      return await res.json();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async function actualizarHorasOcupadas(fecha) {
+    const horasOcupadas = await obtenerHorasOcupadas(fecha);
+    const horasNormalizadas = horasOcupadas.map(h => String(h).substring(0, 5));
+
+    document.querySelectorAll(".slot-btn").forEach(btn => {
+      const horaBoton = String(btn.dataset.slot || btn.textContent).substring(0, 5);
+
+      btn.disabled = false;
+      btn.classList.remove("disabled");
+      btn.style.pointerEvents = "auto";
+      btn.textContent = horaBoton;
+
+      if (horasNormalizadas.includes(horaBoton)) {
+        btn.disabled = true;
+        btn.classList.add("disabled");
+        btn.style.pointerEvents = "none";
+        btn.textContent = horaBoton + " Ocupado";
+      }
     });
   }
 
@@ -84,11 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
       button.className = "calendar-day-ui";
 
       const available = isTuesday(date) && !isPastDay(date);
-      if (!available) {
-        button.classList.add("disabled");
-      } else {
-        button.classList.add("enabled");
-      }
+
+      button.classList.add(available ? "enabled" : "disabled");
 
       if (
         selectedDate &&
@@ -104,15 +119,19 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="calendar-day-label">${isTuesday(date) ? "Martes" : ""}</span>
       `;
 
-      button.addEventListener("click", () => {
+      button.addEventListener("click", async () => {
         if (!available) return;
 
         selectedDate = date;
-        fechaInput.value = formatDateYYYYMMDD(date);
+        const fecha = formatDateYYYYMMDD(date);
+
+        fechaInput.value = fecha;
         fechaVisible.value = formatDateReadable(date);
         calendarSelectedInfo.textContent = `Fecha seleccionada: ${formatDateReadable(date)}`;
+
         clearHourSelection();
         renderCalendar();
+        await actualizarHorasOcupadas(fecha);
       });
 
       calendarGrid.appendChild(button);
@@ -131,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   slotsGrid.addEventListener("click", (e) => {
     const btn = e.target.closest(".slot-btn");
-    if (!btn) return;
+    if (!btn || btn.disabled || btn.classList.contains("disabled")) return;
 
     if (!fechaInput.value) {
       alert("Primero selecciona una fecha en el calendario.");
@@ -140,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll(".slot-btn").forEach(slot => slot.classList.remove("active"));
     btn.classList.add("active");
-    horaInput.value = btn.dataset.slot;
+    horaInput.value = String(btn.dataset.slot || btn.textContent).substring(0, 5);
   });
 
   form.addEventListener("submit", (e) => {
@@ -159,12 +178,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderCalendar();
 });
-
-async function obtenerHorasOcupadas(fecha) {
-  try {
-    const res = await fetch(`horas_ocupadas.php?fecha=${fecha}`);
-    return await res.json();
-  } catch (e) {
-    return [];
-  }
-}
