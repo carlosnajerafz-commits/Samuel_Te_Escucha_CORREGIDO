@@ -225,7 +225,7 @@
     <img src="assets/img/whats.png" alt="WhatsApp" class="index-img-btn">
   </a>
 
-  <img src="assets/img/legislatura.png" alt="Legislatura" class="index-img-btn">
+  
 </div>
   </div>
 </header>
@@ -301,6 +301,7 @@
     </div>
     <div>Oficina virtual</div>
     <a href="login.php" onclick="alert('Solo el personal tiene acceso a este apartado')">Personal</a>
+    <img src="assets/img/legislatura.png" alt="Legislatura" class="index-img-btn">
   </div>
 </footer>
 
