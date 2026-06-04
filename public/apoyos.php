@@ -117,23 +117,6 @@ if (isset($_GET["error"])) {
         </div>
 
         <div class="form-group">
-          <label class="help-inline">
-            Sección electoral
-            <button type="button" class="help-btn" onclick="document.getElementById('modalSeccion').style.display='flex'">?</button>
-          </label>
-          <input
-            type="text"
-            name="seccion_electoral"
-            maxlength="4"
-            minlength="4"
-            pattern="[0-9]{4}"
-            inputmode="numeric"
-            required
-            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);"
-          >
-        </div>
-
-        <div class="form-group">
           <label>Calle</label>
           <input type="text" name="calle" required>
         </div>
@@ -215,16 +198,6 @@ if (isset($_GET["error"])) {
   </div>
 
 </main>
-
-<!-- Modal sección electoral -->
-<div id="modalSeccion" class="status-modal-overlay" style="display:none;">
-  <div class="status-modal">
-    <h3>¿Dónde encuentro mi sección electoral?</h3>
-    <p>Busca este dato en tu credencial para votar.</p>
-    <img src="assets/img/INE.jpg.jpeg" alt="Ejemplo de sección electoral" class="help-preview">
-    <button type="button" class="btn" onclick="document.getElementById('modalSeccion').style.display='none'">Cerrar</button>
-  </div>
-</div>
 
 <footer class="footer">
   <div class="wrap footer__inner">
