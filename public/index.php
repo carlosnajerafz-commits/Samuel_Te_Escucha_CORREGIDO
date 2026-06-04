@@ -211,20 +211,22 @@
       </div>
     </div>
 
-    <div class="hero__actions index-actions">
-      <a href="https://maps.app.goo.gl/pS8VFPf7iK7U2AzM6" target="_blank">
-        <img src="assets/img/locali.png" alt="Ubícanos" class="index-img-btn">
-      </a>
-      <a href="https://www.facebook.com/share/17BRGoeBCM/?mibextid=wwXIfr" target="_blank">
-        <img src="assets/img/facebook logo.jpg.jpeg" alt="Facebook" class="index-img-btn">
-      </a>
-      <a href="https://www.instagram.com/samueledomex?igsh=dXR2cGpmYm1rejEy" target="_blank">
-        <img src="assets/img/instagram logo.jpg.jpeg" alt="Instagram" class="index-img-btn">
-      </a>
-      <a href="https://wa.me/525521724723" target="_blank">
-        <img src="assets/img/whats.png" alt="WhatsApp" class="index-img-btn">
-      </a>
-    </div>
+   <div class="hero__actions index-actions">
+  <a href="https://maps.app.goo.gl/pS8VFPf7iK7U2AzM6" target="_blank">
+    <img src="assets/img/locali.png" alt="Ubícanos" class="index-img-btn">
+  </a>
+  <a href="https://www.facebook.com/share/17BRGoeBCM/?mibextid=wwXIfr" target="_blank">
+    <img src="assets/img/facebook logo.jpg.jpeg" alt="Facebook" class="index-img-btn">
+  </a>
+  <a href="https://www.instagram.com/samueledomex?igsh=dXR2cGpmYm1rejEy" target="_blank">
+    <img src="assets/img/instagram logo.jpg.jpeg" alt="Instagram" class="index-img-btn">
+  </a>
+  <a href="https://wa.me/525521724723" target="_blank">
+    <img src="assets/img/whats.png" alt="WhatsApp" class="index-img-btn">
+  </a>
+
+  <img src="assets/img/legislatura.png" alt="Legislatura" class="index-img-btn">
+</div>
   </div>
 </header>
 
