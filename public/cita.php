@@ -26,6 +26,12 @@ if (isset($_GET["error"])) {
     };
     $modalTipo = "error";
 }
+
+// Verificar modo mantenimiento
+if (file_exists(__DIR__ . "/maintenance.flag")) {
+    include "maintenance.php";
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">

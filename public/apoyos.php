@@ -26,6 +26,13 @@ if (isset($_GET["error"])) {
         : "No fue posible registrar tu solicitud. Verifica los datos e inténtalo de nuevo.";
     $modalTipo = "error";
 }
+
+// Verificar modo mantenimiento
+if (file_exists(__DIR__ . "/maintenance.flag")) {
+    include "maintenance.php";
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
