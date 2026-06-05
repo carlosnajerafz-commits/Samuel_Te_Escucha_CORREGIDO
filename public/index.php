@@ -234,9 +234,7 @@
 <section class="hero hero--carousel">
   <div class="carousel" id="heroCarousel">
 
-    <div class="carousel__slide active" style="background-image:url('assets/img/ISamuel1.jpg');">
-      <div class="carousel__overlay"></div>
-    </div>
+   
     <div class="carousel__slide" style="background-image:url('assets/img/juntos.png');">
       <div class="carousel__overlay"></div>
     </div>
@@ -249,11 +247,6 @@
     <div class="carousel__slide" style="background-image:url('assets/img/ISamuel7.jpg');">
       <div class="carousel__overlay"></div>
     </div>
-    <div class="carousel__slide" style="background-image:url('assets/img/ISamuel10.jpg');">
-      <div class="carousel__overlay"></div>
-    </div>
-    <div class="carousel__slide" style="background-image:url('assets/img/ISamuel11.png');">
-      <div class="carousel__overlay"></div>
     </div>
     <div class="carousel__slide" style="background-image:url('assets/img/CentralJove1.jpeg');">
       <div class="carousel__overlay"></div>
