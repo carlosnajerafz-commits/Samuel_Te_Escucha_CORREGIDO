@@ -234,23 +234,28 @@
 <section class="hero hero--carousel">
   <div class="carousel" id="heroCarousel">
 
-   
     <div class="carousel__slide" style="background-image:url('assets/img/juntos.png');">
       <div class="carousel__overlay"></div>
     </div>
+
     <div class="carousel__slide" style="background-image:url('assets/img/ISamuel3.jpg');">
       <div class="carousel__overlay"></div>
     </div>
+
     <div class="carousel__slide" style="background-image:url('assets/img/ISamuel5.jpg');">
       <div class="carousel__overlay"></div>
     </div>
+
     <div class="carousel__slide" style="background-image:url('assets/img/ISamuel7.jpg');">
       <div class="carousel__overlay"></div>
     </div>
-    </div>
+
     <div class="carousel__slide" style="background-image:url('assets/img/CentralJove1.jpeg');">
       <div class="carousel__overlay"></div>
     </div>
+
+  </div>
+</section>
 
     <div class="hero__content wrap">
       <h1>Samuel Te Escucha</h1>
