@@ -211,7 +211,7 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
   <div class="wrap topbar__inner">
     <div class="brand">
       <div class="brand__logo brand-logo-carousel" id="brandLogoCarousel">
-        <img src="assets/img/legislatura1.png" alt="Samuel Te Escucha" class="brand-logo-slide">
+        <img src="assets/img/legislatura3.png" alt="Samuel Te Escucha" class="brand-logo-slide">
       </div>
       <div>
         <h2>Dip. Samuel Hernández Cruz</h2>
