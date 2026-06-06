@@ -57,7 +57,7 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
   <div class="wrap topbar__inner">
     <div class="brand">
       <div class="brand__logo">
-        <img src="assets/img/logoguinda.jpeg" alt="Samuel Te Escucha">
+        <img src="assets/img/legislatura1.png" alt="Samuel Te Escucha">
       </div>
       <div>
         <h2>Samuel Te Escucha</h2>

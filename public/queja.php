@@ -121,7 +121,7 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
 <header class="q-topbar">
   <div class="q-wrap q-topbar-inner">
     <a href="index.php" class="q-brand">
-      <div class="q-brand-logo"><img src="assets/img/logoguinda.jpeg" alt="Logo"></div>
+      <div class="q-brand-logo"><img src="assets/img/legislatura1.jpeg" alt="Logo"></div>
       <div><h2>Samuel Te Escucha</h2></div>
     </a>
     <nav class="q-nav">
@@ -134,7 +134,7 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
 
 <main class="q-wrap q-page-shell">
   <div class="q-page-header">
-    <h1>¿Tienes problemas con el alumbrado, agua, seguridad o servicios públicos? Reportalo aquí y lo canalizaremos de inmediato con las autoridades correspondientes.</h1>
+    <h1>Reporta problemas de servicios públicos, seguridad, agua o alumbrado, y tu solicitud será canalizada directamente con las autoridades correspondientes.</h1>
     <p>Completa el formulario para recibir atención por parte de nuestro equipo.</p>
   </div>
 
