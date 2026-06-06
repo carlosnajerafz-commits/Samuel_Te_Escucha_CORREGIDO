@@ -10,19 +10,15 @@ if (!isset($_SESSION["empleado_id"])) {
 // Después de session_start() y require_once "db.php"
 $enMantenimiento = file_exists(__DIR__ . "/maintenance.flag");
 
+/* =========================================
+   MENSAJES
+========================================= */
 $mensajeDashboard = "";
 if (isset($_GET["mantenimiento"])) {
     $mensajeDashboard = $_GET["mantenimiento"] === "activado"
         ? "🔧 Modo mantenimiento ACTIVADO. El sitio público muestra la página de mantenimiento."
         : "✅ Modo mantenimiento DESACTIVADO. El sitio está visible al público.";
-}
-// ... resto de los elseif que ya tienes
-
-/* =========================================
-   MENSAJES
-========================================= */
-$mensajeDashboard = "";
-if (isset($_GET["cita_eliminada"]))           $mensajeDashboard = "La cita fue eliminada correctamente.";
+} elseif (isset($_GET["cita_eliminada"]))           $mensajeDashboard = "La cita fue eliminada correctamente.";
 elseif (isset($_GET["queja_eliminada"]))      $mensajeDashboard = "La queja fue eliminada correctamente.";
 elseif (isset($_GET["queja_actualizada"]))    $mensajeDashboard = "La queja fue actualizada correctamente.";
 elseif (isset($_GET["cita_actualizada"]))     $mensajeDashboard = "La solicitud o cita fue actualizada correctamente.";
