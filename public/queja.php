@@ -121,7 +121,7 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
 <header class="q-topbar">
   <div class="q-wrap q-topbar-inner">
     <a href="index.php" class="q-brand">
-      <div class="q-brand-logo"><img src="assets/img/legislatura1.jpeg" alt="Logo"></div>
+      <div class="q-brand-logo"><img src="assets/img/legislatura3.jpeg" alt="Logo"></div>
       <div><h2>Samuel Te Escucha</h2></div>
     </a>
     <nav class="q-nav">
