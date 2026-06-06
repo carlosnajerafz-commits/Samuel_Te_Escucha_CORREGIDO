@@ -24,14 +24,15 @@
   <meta name="twitter:image" content="https://samuelteescucha.com/assets/img/logo.png">
 
   <style>
+    /* ====== MODAL RESUMEN ====== */
     #privacyOverlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 9999;
       display: flex; align-items: center; justify-content: center;
       backdrop-filter: blur(4px); padding: 20px;
     }
     #privacyModal {
-      background: #fff; border-radius: 20px; width: min(680px, 100%);
-      max-height: 88vh; display: flex; flex-direction: column;
+      background: #fff; border-radius: 20px; width: min(500px, 100%);
+      display: flex; flex-direction: column;
       box-shadow: 0 25px 60px rgba(0,0,0,0.25); overflow: hidden;
     }
     #privacyModal .pm-header {
@@ -45,30 +46,76 @@
     #privacyModal .pm-header h2 { margin: 0; font-size: 18px; font-weight: 800; line-height: 1.2; }
     #privacyModal .pm-header p  { margin: 4px 0 0; font-size: 13px; opacity: .85; }
     #privacyModal .pm-body {
+      padding: 24px 28px 8px;
+      font-size: 14px; line-height: 1.7; color: #374151;
+    }
+    #privacyModal .pm-body p  { margin: 0 0 10px; }
+    #privacyModal .pm-body ul { margin: 0 0 10px 18px; padding: 0; }
+    #privacyModal .pm-body ul li { margin-bottom: 4px; }
+    #privacyModal .pm-footer {
+      padding: 12px 28px 24px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    #privacyModal .pm-accept {
+      background: rgb(122,23,55); color: #fff; border: none;
+      border-radius: 12px; padding: 14px 28px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: opacity .15s; width: 100%;
+    }
+    #privacyModal .pm-accept:hover { opacity: .88; }
+    #privacyModal .pm-link {
+      background: none; border: none; color: rgb(122,23,55);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      text-decoration: underline; text-align: center; padding: 0;
+    }
+    #privacyModal .pm-link:hover { opacity: .75; }
+
+    /* ====== MODAL AVISO COMPLETO ====== */
+    #privacyFullOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px); padding: 20px;
+    }
+    #privacyFullModal {
+      background: #fff; border-radius: 20px; width: min(680px, 100%);
+      max-height: 88vh; display: flex; flex-direction: column;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.3); overflow: hidden;
+    }
+    .pfm-header {
+      background: rgb(122,23,55); color: #fff; padding: 20px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .pfm-header h2 { margin: 0; font-size: 17px; font-weight: 800; }
+    .pfm-close {
+      background: rgba(255,255,255,0.2); border: none; color: #fff;
+      border-radius: 8px; width: 34px; height: 34px; font-size: 18px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .pfm-close:hover { background: rgba(255,255,255,0.35); }
+    .pfm-body {
       padding: 24px 28px; overflow-y: auto; flex: 1;
       font-size: 13.5px; line-height: 1.7; color: #374151;
     }
-    #privacyModal .pm-body h3 {
-      font-size: 14px; color: rgb(122,23,55); margin: 20px 0 6px;
+    .pfm-body h3 {
+      font-size: 13px; color: rgb(122,23,55); margin: 20px 0 6px;
       font-weight: 800; text-transform: uppercase; letter-spacing: .03em;
     }
-    #privacyModal .pm-body h3:first-child { margin-top: 0; }
-    #privacyModal .pm-body ul { margin: 6px 0 0 18px; padding: 0; }
-    #privacyModal .pm-body ul li { margin-bottom: 4px; }
-    #privacyModal .pm-footer {
-      padding: 18px 28px; border-top: 1px solid #e5e7eb;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; flex-shrink: 0; flex-wrap: wrap; background: #fafafa;
+    .pfm-body h3:first-child { margin-top: 0; }
+    .pfm-body ul { margin: 6px 0 0 18px; padding: 0; }
+    .pfm-body ul li { margin-bottom: 4px; }
+    .pfm-footer {
+      padding: 16px 28px; border-top: 1px solid #e5e7eb;
+      flex-shrink: 0; background: #fafafa;
     }
-    #privacyModal .pm-footer p { margin: 0; font-size: 12px; color: #6b7280; flex: 1; }
-    #privacyModal .pm-accept {
-      background: rgb(122,23,55); color: #fff; border: none; border-radius: 12px;
-      padding: 12px 28px; font-size: 15px; font-weight: 700;
-      cursor: pointer; white-space: nowrap; transition: opacity .15s;
+    .pfm-footer button {
+      background: rgb(122,23,55); color: #fff; border: none;
+      border-radius: 12px; padding: 12px 28px;
+      font-size: 14px; font-weight: 700; cursor: pointer; width: 100%;
     }
-    #privacyModal .pm-accept:hover { opacity: .88; }
-    #privacyModal .pm-body::-webkit-scrollbar { width: 5px; }
-    #privacyModal .pm-body::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+    .pfm-body::-webkit-scrollbar { width: 5px; }
+    .pfm-body::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
   </style>
 </head>
 
@@ -81,7 +128,7 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
 
 <body class="index-page">
 
-<!-- MODAL AVISO DE PRIVACIDAD -->
+<!-- ====== MODAL RESUMEN PRIVACIDAD ====== -->
 <div id="privacyOverlay">
   <div id="privacyModal">
     <div class="pm-header">
@@ -92,8 +139,31 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
       </div>
     </div>
     <div class="pm-body">
+      <p>Al usar este sitio, aceptas que la <strong>Oficina de Atención Ciudadana del Diputado Samuel Hernández Cruz</strong> tratará tus datos personales para:</p>
+      <ul>
+        <li>Registrar y dar seguimiento a solicitudes de cita, apoyos y quejas.</li>
+        <li>Contactarte en relación con tu trámite.</li>
+        <li>Canalizar asuntos ante dependencias gubernamentales.</li>
+      </ul>
+      <p>Tus datos <strong>no serán vendidos</strong> a terceros. Puedes ejercer tus derechos ARCO llamando al <strong>55 2172 4723</strong>.</p>
+    </div>
+    <div class="pm-footer">
+      <button class="pm-accept" onclick="aceptarPrivacidad()">Aceptar y continuar</button>
+      <button class="pm-link" onclick="abrirAvisoCompleto()">Leer aviso de privacidad completo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL AVISO COMPLETO ====== -->
+<div id="privacyFullOverlay">
+  <div id="privacyFullModal">
+    <div class="pfm-header">
+      <h2>Aviso de Privacidad Integral</h2>
+      <button class="pfm-close" onclick="cerrarAvisoCompleto()">✕</button>
+    </div>
+    <div class="pfm-body">
       <h3>I. Identidad y domicilio del responsable</h3>
-      <p>El sitio web SamuelTeEscucha.com, operado por la Oficina de Atención Ciudadana del Diputado Samuel Hernández Cruz, con domicilio en el Distrito XXXIII del Estado de México, es responsable del tratamiento de sus datos personales de conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.</p>
+      <p>El sitio web SamuelTeEscucha.com, operado por la Oficina de Atención Ciudadana del Diputado Samuel Hernández Cruz, con domicilio en el Distrito XXXIII del Estado de México, es responsable del tratamiento de sus datos personales de conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, su Reglamento y demás disposiciones aplicables.</p>
 
       <h3>II. Datos personales recabados</h3>
       <ul>
@@ -101,7 +171,7 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
         <li>Datos de contacto: número telefónico, correo electrónico, domicilio, municipio y colonia de residencia.</li>
         <li>Datos relacionados con la gestión ciudadana: solicitudes de apoyo, peticiones, quejas, reportes y documentación de soporte.</li>
       </ul>
-      <p>La Plataforma no recaba datos personales sensibles salvo que sean indispensables para gestionar apoyos específicos y con consentimiento expreso.</p>
+      <p>La Plataforma no recaba datos personales sensibles salvo que sean indispensables para gestionar apoyos específicos y con consentimiento expreso del ciudadano.</p>
 
       <h3>III. Finalidades del tratamiento</h3>
       <p><strong>Primarias:</strong></p>
@@ -114,26 +184,25 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
         <li>Llevar controles estadísticos y administrativos.</li>
         <li>Cumplir obligaciones legales.</li>
       </ul>
-      <p><strong>Secundarias:</strong> informar sobre programas y jornadas de atención ciudadana. Puede oponerse sin que ello afecte la atención de su solicitud.</p>
+      <p><strong>Secundarias:</strong> informar sobre programas, actividades y jornadas de atención ciudadana. Puede oponerse enviando solicitud al Responsable sin que ello afecte la atención de su trámite.</p>
 
-      <h3>IV. Transferencia de datos</h3>
-      <p>Sus datos podrán transferirse a dependencias públicas cuando sea necesario para atender su solicitud. El Responsable no comercializa ni vende datos personales a terceros.</p>
+      <h3>IV. Transferencia de datos personales</h3>
+      <p>Sus datos podrán transferirse, sin requerir consentimiento adicional, a dependencias de la Administración Pública Federal, Estatal o Municipal, organismos autónomos o autoridades judiciales cuando sea necesario para gestionar su solicitud. El Responsable no comercializa ni vende datos personales a terceros.</p>
 
-      <h3>V. Seguridad</h3>
-      <p>Se implementan medidas de seguridad administrativas, técnicas y físicas para proteger sus datos contra acceso no autorizado.</p>
+      <h3>V. Seguridad de los datos personales</h3>
+      <p>Se implementan medidas de seguridad administrativas, técnicas y físicas para proteger sus datos contra daño, pérdida, alteración, destrucción o acceso no autorizado.</p>
 
       <h3>VI. Derechos ARCO</h3>
-      <p>Puede acceder, rectificar, cancelar u oponerse al tratamiento de sus datos enviando solicitud al: <strong>55 2172 4723</strong>.</p>
+      <p>Usted tiene derecho a acceder, rectificar, cancelar u oponerse al tratamiento de sus datos. Para ejercerlos envíe una solicitud al número: <strong>55 2172 4723</strong>, incluyendo nombre completo, medio de respuesta, documentos de identidad y descripción del derecho a ejercer.</p>
 
       <h3>VII. Revocación del consentimiento</h3>
-      <p>Puede revocar el consentimiento en cualquier momento mediante solicitud al número indicado.</p>
+      <p>Puede revocar en cualquier momento el consentimiento otorgado mediante solicitud al número indicado. Ciertas obligaciones legales pueden impedir la eliminación inmediata de determinada información.</p>
 
-      <h3>VIII. Cambios al aviso</h3>
-      <p>Las modificaciones estarán disponibles en <strong>samuelteescucha.com</strong>. Última actualización: junio de 2026.</p>
+      <h3>VIII. Cambios al aviso de privacidad</h3>
+      <p>Cualquier modificación estará disponible en <strong>samuelteescucha.com</strong>. Para dudas: <strong>55 2172 4723</strong>. Última actualización: junio de 2026.</p>
     </div>
-    <div class="pm-footer">
-      <p>Al hacer clic en "Aceptar y continuar" confirmas que has leído este aviso de privacidad.</p>
-      <button class="pm-accept" onclick="aceptarPrivacidad()">Aceptar y continuar</button>
+    <div class="pfm-footer">
+      <button onclick="cerrarAvisoCompleto()">Cerrar</button>
     </div>
   </div>
 </div>
@@ -142,11 +211,11 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
   <div class="wrap topbar__inner">
     <div class="brand">
       <div class="brand__logo brand-logo-carousel" id="brandLogoCarousel">
-        <img src="assets/img/SM_LOGO.png" alt="Samuel Te Escucha" class="brand-logo-slide">
-        <img src="assets/img/logoguinda.jpeg" alt="Samuel Te Escucha" class="brand-logo-slide">
+        <img src="assets/img/legislatura.png" alt="Samuel Te Escucha" class="brand-logo-slide">
       </div>
       <div>
-        <h2>Samuel Te Escucha</h2>
+        <h2>Dip. Samuel Hernández Cruz</h2>
+        <h3>Distrito XXXIII</h3>
       </div>
     </div>
 
@@ -163,7 +232,6 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
       <a href="https://wa.me/525521724723" target="_blank">
         <img src="assets/img/whats.png" alt="WhatsApp" class="index-img-btn">
       </a>
-      <img src="assets/img/legislatura.png" alt="Legislatura" class="index-img-btn">
     </div>
   </div>
 </header>
@@ -172,7 +240,6 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
 <section class="hero hero--carousel">
   <div class="carousel" id="heroCarousel">
 
-   
     <div class="carousel__slide" style="background-image:url('assets/img/juntos.png');">
       <div class="carousel__overlay"></div>
     </div>
@@ -185,20 +252,18 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
     <div class="carousel__slide" style="background-image:url('assets/img/ISamuel7.jpg');">
       <div class="carousel__overlay"></div>
     </div>
- 
     <div class="carousel__slide" style="background-image:url('assets/img/CentralJove1.jpeg');">
       <div class="carousel__overlay"></div>
     </div>
 
-    <!-- Contenido superpuesto al carrusel -->
     <div class="hero__content wrap">
-      <h1>Samuel Te Escucha</h1>
-      <p>Tú diputado te escucha, te apoya y te resuelve</p>
+      <h1>Oficina virtual</h1>
+      <p>De atención ciudadana</p>
       <div class="carousel__dots" id="carouselDots"></div>
     </div>
 
-  </div><!-- /.carousel -->
-</section><!-- /.hero hero--carousel -->
+  </div>
+</section>
 
 <!-- TARJETAS -->
 <main class="wrap section">
@@ -212,12 +277,12 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
 
     <article class="feature-card">
       <h3>Solicitud de Gestión</h3>
-      <p>Reporta problemas de servicios públicos, seguridad, agua, alumbrado y más.</p>
+      <p>¿Tienes problemas con el alumbrado, agua, seguridad o servicios públicos? Reportalo aquí y lo canalizaremos de inmediato con las autoridades correspondientes.</p>
       <a href="queja.php" class="btn">Ir al formulario</a>
     </article>
 
     <article class="feature-card">
-      <h3>Pre-registro para Apoyos</h3>
+      <h3>Pre-registro para Apoyos Solidarios</h3>
       <p>Consulta los apoyos disponibles y registra tu solicitud.</p>
       <a href="apoyos.php" class="btn">Ver apoyos</a>
     </article>
@@ -233,7 +298,6 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
     </div>
     <div>Oficina virtual</div>
     <a href="login.php" onclick="alert('Solo el personal tiene acceso a este apartado')">Personal</a>
-    <img src="assets/img/legislatura.png" alt="Legislatura" class="index-img-btn">
   </div>
 </footer>
 
@@ -257,6 +321,20 @@ function aceptarPrivacidad() {
   document.getElementById("privacyOverlay").style.display = "none";
   try { sessionStorage.setItem("privacyAccepted", "1"); } catch(e) {}
 }
+
+function abrirAvisoCompleto() {
+  document.getElementById("privacyFullOverlay").style.display = "flex";
+}
+
+function cerrarAvisoCompleto() {
+  document.getElementById("privacyFullOverlay").style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("privacyFullOverlay").addEventListener("click", function (e) {
+    if (e.target === this) cerrarAvisoCompleto();
+  });
+});
 
 (function () {
   try {

@@ -134,7 +134,7 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
 
 <main class="q-wrap q-page-shell">
   <div class="q-page-header">
-    <h1>Reporte de Problemáticas</h1>
+    <h1>¿Tienes problemas con el alumbrado, agua, seguridad o servicios públicos? Reportalo aquí y lo canalizaremos de inmediato con las autoridades correspondientes.</h1>
     <p>Completa el formulario para recibir atención por parte de nuestro equipo.</p>
   </div>
 

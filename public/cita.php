@@ -237,6 +237,35 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
           </div>
         </div>
 
+</div><!-- /.appointment-form-card -->
+
+      <!-- Imagen lateral -->
+      <aside style="display:flex;flex-direction:column;">
+        <div style="
+          background:#fff;
+          border:1px solid #e5e7eb;
+          border-radius:24px;
+          overflow:hidden;
+          position:relative;
+          box-shadow:0 14px 38px rgba(17,24,39,.08);
+          flex:1;
+          min-height:400px;
+        ">
+          <div style="
+            position:absolute;inset:0;
+            background:linear-gradient(180deg,rgba(122,23,55,0.1),rgba(122,23,55,0.4));
+            pointer-events:none;z-index:1;
+          "></div>
+          <img
+            src="assets/img/ISamuel12.png"
+            alt="Samuel"
+            style="width:100%;height:100%;object-fit:cover;object-position:center 15%;display:block;"
+          >
+        </div>
+      </aside>
+
+    </div><!-- /.appointment-layout -->
+
       </div>
     </form>
   </section>
