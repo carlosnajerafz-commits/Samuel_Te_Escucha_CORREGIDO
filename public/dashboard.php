@@ -252,6 +252,7 @@ function direccion(array $row): string {
       <a href="empleados_queja.php">Quejas</a>
       <a href="empleados_apoyo.php">Apoyos</a>
       <a href="empleados_cita.php">Citas</a>
+      <a href="admin_cp.php">Codigos postales</a>
       <a href="logout.php">Cerrar sesión</a>
     </nav>
   </div>
