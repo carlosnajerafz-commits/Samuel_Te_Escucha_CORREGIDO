@@ -6,22 +6,21 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-$nombre            = trim($_POST["nombre"]            ?? "");
-$apellido_paterno  = trim($_POST["apellido_paterno"]  ?? "");
-$apellido_materno  = trim($_POST["apellido_materno"]  ?? "");
-$celular_1         = trim($_POST["celular_1"]         ?? "");
-$celular_2         = trim($_POST["celular_2"]         ?? "");
-$correo            = trim($_POST["correo"]            ?? "");
-$seccion_electoral = trim($_POST["seccion_electoral"] ?? "");
-$calle             = trim($_POST["calle"]             ?? "");
-$no_exterior       = trim($_POST["no_exterior"]       ?? "");
-$no_interior       = trim($_POST["no_interior"]       ?? "");
-$colonia           = trim($_POST["colonia"]           ?? "");
-$municipio         = trim($_POST["municipio"]         ?? "");
-$codigo_postal     = trim($_POST["codigo_postal"]     ?? "");
-$fecha             = trim($_POST["fecha"]             ?? "");
-$hora              = trim($_POST["hora"]              ?? "");
-$motivo            = trim($_POST["motivo"]            ?? "");
+$nombre           = trim($_POST["nombre"]           ?? "");
+$apellido_paterno = trim($_POST["apellido_paterno"] ?? "");
+$apellido_materno = trim($_POST["apellido_materno"] ?? "");
+$celular_1        = trim($_POST["celular_1"]        ?? "");
+$celular_2        = trim($_POST["celular_2"]        ?? "");
+$correo           = trim($_POST["correo"]           ?? "");
+$calle            = trim($_POST["calle"]            ?? "");
+$no_exterior      = trim($_POST["no_exterior"]      ?? "");
+$no_interior      = trim($_POST["no_interior"]      ?? "");
+$colonia          = trim($_POST["colonia"]          ?? "");
+$municipio        = trim($_POST["municipio"]        ?? "");
+$codigo_postal    = trim($_POST["codigo_postal"]    ?? "");
+$fecha            = trim($_POST["fecha"]            ?? "");
+$hora             = trim($_POST["hora"]             ?? "");
+$motivo           = trim($_POST["motivo"]           ?? "");
 
 /* =========================================
    VALIDACIONES
@@ -29,7 +28,7 @@ $motivo            = trim($_POST["motivo"]            ?? "");
 if (
     $nombre === "" || $apellido_paterno === "" || $apellido_materno === "" ||
     $celular_1 === "" || $celular_2 === "" || $correo === "" ||
-    $seccion_electoral === "" || $calle === "" || $no_exterior === "" ||
+    $calle === "" || $no_exterior === "" ||
     $colonia === "" || $municipio === "" || $codigo_postal === "" ||
     $fecha === "" || $hora === ""
 ) {
@@ -63,38 +62,33 @@ if ((int)$stmtVerificar->fetchColumn() > 0) {
     exit;
 }
 
-/* =========================================
-   INE — OPCIONAL
-========================================= */
-$inePath = null;
+/* Validar día bloqueado (día completo) */
+$stmtBloqueoDia = $pdo->prepare("
+    SELECT COUNT(*)
+    FROM bloqueos_cita
+    WHERE fecha = :fecha
+      AND dia_completo = TRUE
+");
+$stmtBloqueoDia->execute([":fecha" => $fecha]);
 
-if (isset($_FILES["ine_foto"]) && $_FILES["ine_foto"]["error"] === UPLOAD_ERR_OK) {
-    $ext       = strtolower(pathinfo($_FILES["ine_foto"]["name"], PATHINFO_EXTENSION));
-    $permitidas = ["jpg", "jpeg", "png", "webp"];
+if ((int)$stmtBloqueoDia->fetchColumn() > 0) {
+    header("Location: cita.php?error=bloqueado");
+    exit;
+}
 
-    if (!in_array($ext, $permitidas, true)) {
-        header("Location: cita.php?error=ine");
-        exit;
-    }
+/* Validar hora bloqueada */
+$stmtBloqueoHora = $pdo->prepare("
+    SELECT COUNT(*)
+    FROM bloqueos_cita
+    WHERE fecha = :fecha
+      AND hora = :hora
+      AND dia_completo = FALSE
+");
+$stmtBloqueoHora->execute([":fecha" => $fecha, ":hora" => $hora]);
 
-    if ($_FILES["ine_foto"]["size"] > 5 * 1024 * 1024) {
-        header("Location: cita.php?error=archivo_grande");
-        exit;
-    }
-
-    if (!is_dir(__DIR__ . "/uploads")) {
-        mkdir(__DIR__ . "/uploads", 0777, true);
-    }
-
-    $nombreArchivo = uniqid("ine_cita_", true) . "." . $ext;
-    $destino       = __DIR__ . "/uploads/" . $nombreArchivo;
-
-    if (!move_uploaded_file($_FILES["ine_foto"]["tmp_name"], $destino)) {
-        header("Location: cita.php?error=ine");
-        exit;
-    }
-
-    $inePath = "uploads/" . $nombreArchivo;
+if ((int)$stmtBloqueoHora->fetchColumn() > 0) {
+    header("Location: cita.php?error=bloqueado");
+    exit;
 }
 
 /* =========================================
@@ -104,40 +98,37 @@ try {
     $sql = "
         INSERT INTO citas (
             nombre, apellido_paterno, apellido_materno,
-            celular_1, celular_2, correo, seccion_electoral,
+            celular_1, celular_2, correo,
             calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
             fecha, hora, motivo, ine_path, estatus, created_at
         ) VALUES (
             :nombre, :apellido_paterno, :apellido_materno,
-            :celular_1, :celular_2, :correo, :seccion_electoral,
+            :celular_1, :celular_2, :correo,
             :calle, :no_exterior, :no_interior, :colonia, :municipio, :codigo_postal,
-            :fecha, :hora, :motivo, :ine_path, 'solicitada', NOW()
+            :fecha, :hora, :motivo, NULL, 'solicitada', NOW()
         )
     ";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
-        ":nombre"            => $nombre,
-        ":apellido_paterno"  => $apellido_paterno,
-        ":apellido_materno"  => $apellido_materno,
-        ":celular_1"         => $celular_1,
-        ":celular_2"         => $celular_2,
-        ":correo"            => $correo,
-        ":seccion_electoral" => $seccion_electoral,
-        ":calle"             => $calle,
-        ":no_exterior"       => $no_exterior,
-        ":no_interior"       => $no_interior,
-        ":colonia"           => $colonia,
-        ":municipio"         => $municipio,
-        ":codigo_postal"     => $codigo_postal,
-        ":fecha"             => $fecha,
-        ":hora"              => $hora,
-        ":motivo"            => $motivo,
-        ":ine_path"          => $inePath,
+        ":nombre"           => $nombre,
+        ":apellido_paterno" => $apellido_paterno,
+        ":apellido_materno" => $apellido_materno,
+        ":celular_1"        => $celular_1,
+        ":celular_2"        => $celular_2,
+        ":correo"           => $correo,
+        ":calle"            => $calle,
+        ":no_exterior"      => $no_exterior,
+        ":no_interior"      => $no_interior,
+        ":colonia"          => $colonia,
+        ":municipio"        => $municipio,
+        ":codigo_postal"    => $codigo_postal,
+        ":fecha"            => $fecha,
+        ":hora"             => $hora,
+        ":motivo"           => $motivo,
     ]);
 
     $id = $pdo->lastInsertId();
-
     header("Location: cita.php?ok=1&id=" . $id);
     exit;
 
