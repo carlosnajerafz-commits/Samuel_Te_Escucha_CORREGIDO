@@ -55,12 +55,37 @@ if ($buscar !== "") {
 /* =========================================
    MENSAJE
 ========================================= */
-$mensaje = "";
+$mensaje      = "";
+$errorBloqueo = "";
 if (isset($_GET["ok"]) || isset($_GET["cita_actualizada"])) {
     $mensaje = "El registro fue actualizado correctamente.";
 } elseif (isset($_GET["eliminado"])) {
     $mensaje = "El registro fue eliminado correctamente.";
+} elseif (isset($_GET["bloqueo_ok"])) {
+    $mensaje = "Bloqueo guardado correctamente.";
+} elseif (isset($_GET["bloqueo_eliminado"])) {
+    $mensaje = "Bloqueo eliminado correctamente.";
+} elseif (isset($_GET["bloqueo_error"])) {
+    $errorBloqueo = match($_GET["bloqueo_error"]) {
+        "fecha"     => "Debes seleccionar una fecha.",
+        "no_martes" => "Solo puedes bloquear martes.",
+        "pasada"    => "No puedes bloquear una fecha pasada.",
+        "tipo"      => "Tipo de bloqueo inválido.",
+        "sin_horas" => "Debes seleccionar al menos una hora.",
+        default     => "Error al guardar el bloqueo.",
+    };
 }
+
+/* =========================================
+   BLOQUEOS ACTIVOS
+========================================= */
+$stmtBloq = $pdo->query("
+    SELECT id, fecha, hora, dia_completo, motivo
+    FROM bloqueos_cita
+    WHERE fecha >= CURRENT_DATE
+    ORDER BY fecha ASC, hora ASC
+");
+$bloqueos = $stmtBloq ? $stmtBloq->fetchAll(PDO::FETCH_ASSOC) : [];
 
 /* =========================================
    CONSULTAR SOLICITUDES DE CITA
@@ -201,6 +226,28 @@ $coloresJson = json_encode($colores);
       font-weight:600; border:1px solid #e5e7eb;
     }
     .filtros-bar a.active { background:#7A1737; color:#fff; border-color:#7A1737; }
+    .alert-error {
+      background:#fee2e2; color:#991b1b;
+      border:1px solid #fca5a5;
+      border-radius:10px; padding:12px 18px;
+      margin-bottom:18px; font-weight:600;
+    }
+    .bloqueo-form-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:16px;
+    }
+    .slots-grid-bloqueo {
+      display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;
+    }
+    .slot-check-label {
+      display:flex; align-items:center; gap:6px;
+      padding:8px 12px; border:1px solid #e5e7eb;
+      border-radius:8px; font-size:13px;
+      cursor:pointer; background:#f9fafb; font-weight:400;
+    }
+    .slot-check-label:hover { background:#f3f4f6; }
+    .slot-check-label input { cursor:pointer; accent-color:#7A1737; }
   </style>
 </head>
 <body>
@@ -569,6 +616,158 @@ $coloresJson = json_encode($colores);
     </div>
   </section>
 
+  <!-- ==============================
+       GESTIÓN DE BLOQUEOS
+  ============================== -->
+  <section class="dashboard-card" style="margin-top:22px;">
+    <h2>Bloquear fechas u horas</h2>
+    <p style="color:#6b7280;font-size:13px;margin-bottom:18px;">
+      Inhabilita días completos o franjas horarias específicas para los martes ciudadanos.
+      Los usuarios no podrán seleccionar los horarios bloqueados al pedir una cita.
+    </p>
+
+    <?php if ($errorBloqueo !== ""): ?>
+      <div class="alert-error"><?php echo htmlspecialchars($errorBloqueo); ?></div>
+    <?php endif; ?>
+
+    <form method="POST" action="guardar_bloqueo.php" id="formBloqueo">
+      <div class="bloqueo-form-grid">
+
+        <div class="form-group">
+          <label for="fecha_bloqueo" style="display:block;margin-bottom:6px;font-weight:600;font-size:14px;">Fecha (martes)</label>
+          <input type="date" name="fecha_bloqueo" id="fecha_bloqueo" required
+                 style="padding:10px 14px;border:1px solid #ccc;border-radius:10px;font-size:14px;width:100%;box-sizing:border-box;">
+          <small id="avisoFecha" style="color:#dc2626;display:none;font-size:12px;margin-top:4px;">
+            Solo se pueden bloquear martes.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="motivo_bloqueo" style="display:block;margin-bottom:6px;font-weight:600;font-size:14px;">Motivo (opcional)</label>
+          <input type="text" name="motivo_bloqueo" id="motivo_bloqueo" maxlength="200"
+                 placeholder="Ej: Reunión, día festivo..."
+                 style="padding:10px 14px;border:1px solid #ccc;border-radius:10px;font-size:14px;width:100%;box-sizing:border-box;">
+        </div>
+
+        <div class="form-group" style="grid-column:1/-1;">
+          <label style="display:block;margin-bottom:8px;font-weight:600;font-size:14px;">Tipo de bloqueo</label>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;">
+            <label class="slot-check-label" style="border:none;padding:0;">
+              <input type="radio" name="tipo_bloqueo" value="dia_completo" checked onchange="toggleHorasBloqueo(this)">
+              Día completo
+            </label>
+            <label class="slot-check-label" style="border:none;padding:0;">
+              <input type="radio" name="tipo_bloqueo" value="horas" onchange="toggleHorasBloqueo(this)">
+              Horas específicas
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" id="panelHorasBloqueo" style="grid-column:1/-1;display:none;">
+          <label style="display:block;margin-bottom:8px;font-weight:600;font-size:14px;">Selecciona las horas a bloquear</label>
+          <div class="slots-grid-bloqueo">
+            <?php
+              $todosSlots = ["09:00","09:20","09:40","10:00","10:20","10:40",
+                             "11:00","11:20","11:40","12:00","12:20","12:40",
+                             "13:00","13:20","13:40","14:00","14:20","14:40"];
+              foreach ($todosSlots as $sl):
+                [$sh,$sm] = explode(":", $sl);
+                $finMins  = (int)$sh * 60 + (int)$sm + 20;
+                $fin      = sprintf("%02d:%02d", intdiv($finMins, 60), $finMins % 60);
+            ?>
+              <label class="slot-check-label">
+                <input type="checkbox" name="horas_bloqueo[]" value="<?php echo $sl; ?>">
+                <?php echo $sl; ?> - <?php echo $fin; ?>
+              </label>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:18px;">
+        <button type="submit" class="btn" id="btnGuardarBloqueo">Guardar bloqueo</button>
+      </div>
+    </form>
+
+    <!-- ---- Bloqueos activos ---- -->
+    <?php
+      $bloqueosPorFecha = [];
+      foreach ($bloqueos as $b) {
+          $bloqueosPorFecha[$b["fecha"]][] = $b;
+      }
+    ?>
+
+    <h3 style="margin-top:30px;margin-bottom:12px;color:#7A1737;font-size:16px;">
+      Bloqueos activos
+      <span style="font-size:13px;font-weight:400;color:#6b7280;margin-left:6px;">(<?php echo count($bloqueosPorFecha); ?> fecha<?php echo count($bloqueosPorFecha) !== 1 ? "s" : ""; ?>)</span>
+    </h3>
+
+    <?php if (empty($bloqueosPorFecha)): ?>
+      <div style="color:#6b7280;font-size:14px;">Sin bloqueos activos.</div>
+    <?php else: ?>
+      <div class="list">
+        <?php foreach ($bloqueosPorFecha as $fechaB => $registros):
+          $esDiaCompleto = false;
+          foreach ($registros as $r) { if ($r["dia_completo"]) { $esDiaCompleto = true; break; } }
+          $fDisplay = date("d/m/Y", strtotime($fechaB));
+          $motBloq  = trim($registros[0]["motivo"] ?? "");
+        ?>
+          <div class="list-item" style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;">
+              <div style="font-weight:700;color:#7A1737;margin-bottom:4px;font-size:14px;">
+                📅 <?php echo htmlspecialchars($fDisplay); ?>
+                <?php if ($esDiaCompleto): ?>
+                  <span class="badge" style="background:#fee2e2;color:#991b1b;margin-left:6px;">Día completo</span>
+                <?php else: ?>
+                  <span class="badge" style="background:#fef9c3;color:#92400e;margin-left:6px;">Horas específicas</span>
+                <?php endif; ?>
+              </div>
+              <?php if (!$esDiaCompleto): ?>
+                <div style="font-size:13px;color:#4b5563;margin-top:3px;">
+                  Horas bloqueadas:
+                  <?php
+                    $horasLista = array_map(fn($r) => substr((string)$r["hora"], 0, 5), $registros);
+                    sort($horasLista);
+                    echo htmlspecialchars(implode(", ", $horasLista));
+                  ?>
+                </div>
+              <?php endif; ?>
+              <?php if (!empty($motBloq)): ?>
+                <div style="font-size:13px;color:#6b7280;margin-top:3px;">
+                  Motivo: <?php echo htmlspecialchars($motBloq); ?>
+                </div>
+              <?php endif; ?>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
+              <?php if ($esDiaCompleto): ?>
+                <form method="POST" action="eliminar_bloqueo.php" style="margin:0;"
+                      onsubmit="return confirm('¿Eliminar bloqueo del día <?php echo addslashes($fDisplay); ?>?');">
+                  <input type="hidden" name="bloqueo_id" value="<?php echo (int)$registros[0]["id"]; ?>">
+                  <button type="submit" class="btn btn--light" style="font-size:12px;padding:5px 12px;">
+                    🗑 Eliminar día
+                  </button>
+                </form>
+              <?php else: ?>
+                <?php foreach ($registros as $reg): ?>
+                  <form method="POST" action="eliminar_bloqueo.php" style="margin:0;"
+                        onsubmit="return confirm('¿Eliminar el bloqueo de las <?php echo addslashes(substr((string)$reg["hora"],0,5)); ?>?');">
+                    <input type="hidden" name="bloqueo_id" value="<?php echo (int)$reg["id"]; ?>">
+                    <button type="submit" class="btn btn--light" style="font-size:12px;padding:5px 12px;">
+                      🗑 <?php echo htmlspecialchars(substr((string)$reg["hora"], 0, 5)); ?>
+                    </button>
+                  </form>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+
+  </section>
+
 </main>
 
 <!-- ====== FOOTER ====== -->
@@ -631,4 +830,25 @@ if (document.getElementById('graficaHoras') && labelsHoras.length) {
 }
 </script>
 
+<script>
+/* ---- Bloqueos: mostrar/ocultar horas ---- */
+function toggleHorasBloqueo(radio) {
+  document.getElementById('panelHorasBloqueo').style.display =
+    radio.value === 'horas' ? 'block' : 'none';
+}
+
+/* ---- Validar que la fecha sea martes ---- */
+document.getElementById('fecha_bloqueo').addEventListener('change', function () {
+  var d = new Date(this.value + 'T00:00:00');
+  var aviso = document.getElementById('avisoFecha');
+  var btn   = document.getElementById('btnGuardarBloqueo');
+  if (this.value && d.getDay() !== 2) {
+    aviso.style.display = 'inline';
+    btn.disabled = true;
+  } else {
+    aviso.style.display = 'none';
+    btn.disabled = false;
+  }
+});
+</script>
 

@@ -38,3 +38,6 @@ try {
 } catch (PDOException $e) {
     die("Error al actualizar el estatus de la solicitud/cita: " . $e->getMessage());
 }
+$destino = ($_POST["origen"] ?? "") === "citas" ? "empleados_cita.php" : "dashboard.php";
+header("Location: " . $destino . "?cita_actualizada=1");
+exit;
