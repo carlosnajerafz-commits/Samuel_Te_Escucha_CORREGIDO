@@ -20,6 +20,7 @@ if (isset($_GET["error"])) {
     $modalMensaje = match($error) {
         "martes"         => "Solo se pueden solicitar citas para los martes.",
         "ocupada"        => "Ya existe una cita en esa fecha y horario.",
+        "bloqueado"      => "La fecha u hora seleccionada no está disponible. Por favor elige otro horario.",
         "celular"        => "Los celulares deben tener 10 dígitos.",
         "archivo_grande" => "La imagen supera los 5 MB permitidos.",
         default          => "Error al generar la cita.",
