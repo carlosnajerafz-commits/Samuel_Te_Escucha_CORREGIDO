@@ -281,6 +281,13 @@ $coloresJson = json_encode($colores);
     <div class="alert-success"><?php echo htmlspecialchars($mensaje); ?></div>
   <?php endif; ?>
 
+  <!-- Acceso rápido a bloqueos -->
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+    <a href="#seccionBloqueos" class="btn" style="background:#7A1737;color:#fff;text-decoration:none;">
+      🔒 Gestionar bloqueos
+    </a>
+  </div>
+
   <!-- Filtros de tiempo -->
   <div class="filtros-bar">
     <a href="?filtro=3dias<?php echo $buscar !== "" ? "&buscar=".urlencode($buscar) : ""; ?>"
@@ -619,7 +626,7 @@ $coloresJson = json_encode($colores);
   <!-- ==============================
        GESTIÓN DE BLOQUEOS
   ============================== -->
-  <section class="dashboard-card" style="margin-top:22px;">
+  <section class="dashboard-card" id="seccionBloqueos" style="margin-top:22px;">
     <h2>Bloquear fechas u horas</h2>
     <p style="color:#6b7280;font-size:13px;margin-bottom:18px;">
       Inhabilita días completos o franjas horarias específicas para los martes ciudadanos.
