@@ -31,7 +31,6 @@ if (
     $apellido_materno === "" ||
     $celular_1 === "" ||
     $correo === "" ||
-    $seccion_electoral === "" ||
     $calle === "" ||
     $no_exterior === "" ||
     $codigo_postal === "" ||
@@ -80,7 +79,7 @@ if (isset($_FILES["evidencia"]) && $_FILES["evidencia"]["error"] === UPLOAD_ERR_
     $uploadDir = __DIR__ . "/uploads";
 
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        mkdir($uploadDir, 0755, true);
     }
 
     $nombreArchivo = uniqid("queja_", true) . "." . $ext;
@@ -164,6 +163,7 @@ header("Location: queja.php?ok=1&id=" . $id);
 exit;
 
 } catch (PDOException $e) {
-    die("Error SQL en guardar_queja.php: " . $e->getMessage());
+    header("Location: queja.php?error=1");
+    exit;
 }
 ?>
