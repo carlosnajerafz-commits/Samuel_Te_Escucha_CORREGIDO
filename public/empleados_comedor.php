@@ -49,8 +49,10 @@ if ($filtroEvento > 0) {
 
 $sql = "
     SELECT r.id, r.evento_id, r.nombre, r.apellido_paterno, r.apellido_materno,
-           r.celular_1, r.celular_2, r.correo, r.numero_personas,
-           r.observaciones, r.estatus, r.created_at,
+           r.celular_1, r.celular_2, r.correo,
+           r.seccion_electoral, r.calle, r.no_exterior, r.no_interior,
+           r.colonia, r.municipio, r.codigo_postal,
+           r.numero_personas, r.observaciones, r.estatus, r.created_at,
            e.fecha, e.hora_inicio, e.hora_fin, e.lugar
     FROM registros_comedor r
     LEFT JOIN eventos_comedor e ON e.id = r.evento_id
@@ -228,6 +230,21 @@ function nombreCompleto(array $row): string {
 
         <?php if (!empty($r["correo"])): ?>
           <div class="registro-card__info">✉️ <?php echo htmlspecialchars($r["correo"]); ?></div>
+        <?php endif; ?>
+
+        <?php
+          $dir = trim(($r["calle"] ?? "") . " #" . ($r["no_exterior"] ?? ""));
+          if (!empty($r["no_interior"])) $dir .= " Int. " . $r["no_interior"];
+          if (!empty($r["colonia"]))     $dir .= ", Col. " . $r["colonia"];
+          if (!empty($r["municipio"]))   $dir .= ", " . $r["municipio"];
+          if (!empty($r["codigo_postal"])) $dir .= ", CP " . $r["codigo_postal"];
+        ?>
+        <?php if (!empty($r["calle"])): ?>
+          <div class="registro-card__info">🏠 <?php echo htmlspecialchars($dir); ?></div>
+        <?php endif; ?>
+
+        <?php if (!empty($r["seccion_electoral"])): ?>
+          <div class="registro-card__info">🗳️ Sección: <?php echo htmlspecialchars($r["seccion_electoral"]); ?></div>
         <?php endif; ?>
 
         <?php if (!empty($r["observaciones"])): ?>

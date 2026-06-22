@@ -13,6 +13,13 @@ $apellidoMat   = trim($_POST["apellido_materno"] ?? "");
 $celular1      = preg_replace("/\D/", "", $_POST["celular_1"] ?? "");
 $celular2      = preg_replace("/\D/", "", $_POST["celular_2"] ?? "");
 $correo        = trim($_POST["correo"] ?? "");
+$seccion       = trim($_POST["seccion_electoral"] ?? "");
+$calle         = trim($_POST["calle"] ?? "");
+$noExterior    = trim($_POST["no_exterior"] ?? "");
+$noInterior    = trim($_POST["no_interior"] ?? "");
+$colonia       = trim($_POST["colonia"] ?? "");
+$municipio     = trim($_POST["municipio"] ?? "");
+$cp            = preg_replace("/\D/", "", $_POST["codigo_postal"] ?? "");
 $numPersonas   = (int)($_POST["numero_personas"] ?? 1);
 $observaciones = trim($_POST["observaciones"] ?? "");
 
@@ -65,26 +72,38 @@ if ((int)$evento["cupo_maximo"] > 0) {
     }
 }
 
-// Insertar registro
 $stmt = $pdo->prepare("
     INSERT INTO registros_comedor
         (evento_id, nombre, apellido_paterno, apellido_materno,
-         celular_1, celular_2, correo, numero_personas, observaciones, estatus)
+         celular_1, celular_2, correo,
+         seccion_electoral, calle, no_exterior, no_interior,
+         colonia, municipio, codigo_postal,
+         numero_personas, observaciones, estatus)
     VALUES
         (:evento_id, :nombre, :apellido_paterno, :apellido_materno,
-         :celular_1, :celular_2, :correo, :numero_personas, :observaciones, 'pendiente')
+         :celular_1, :celular_2, :correo,
+         :seccion_electoral, :calle, :no_exterior, :no_interior,
+         :colonia, :municipio, :codigo_postal,
+         :numero_personas, :observaciones, 'pendiente')
 ");
 
 $stmt->execute([
-    ":evento_id"       => $eventoId,
-    ":nombre"          => $nombre,
-    ":apellido_paterno"=> $apellidoPat,
-    ":apellido_materno"=> $apellidoMat,
-    ":celular_1"       => $celular1,
-    ":celular_2"       => $celular2,
-    ":correo"          => $correo,
-    ":numero_personas" => $numPersonas,
-    ":observaciones"   => $observaciones,
+    ":evento_id"         => $eventoId,
+    ":nombre"            => $nombre,
+    ":apellido_paterno"  => $apellidoPat,
+    ":apellido_materno"  => $apellidoMat,
+    ":celular_1"         => $celular1,
+    ":celular_2"         => $celular2,
+    ":correo"            => $correo,
+    ":seccion_electoral" => $seccion,
+    ":calle"             => $calle,
+    ":no_exterior"       => $noExterior,
+    ":no_interior"       => $noInterior,
+    ":colonia"           => $colonia,
+    ":municipio"         => $municipio,
+    ":codigo_postal"     => $cp,
+    ":numero_personas"   => $numPersonas,
+    ":observaciones"     => $observaciones,
 ]);
 
 $id = $pdo->lastInsertId();
