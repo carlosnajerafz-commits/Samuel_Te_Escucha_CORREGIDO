@@ -106,11 +106,25 @@ foreach ($citasAceptadas as $c) {
 /* =========================================
    KPIs
 ========================================= */
+// Próximos eventos de comedor y registros pendientes
+$proximosComedor = $pdo->query("
+    SELECT id, fecha, hora_inicio, hora_fin, lugar,
+           (SELECT COALESCE(SUM(rc.numero_personas),0) FROM registros_comedor rc WHERE rc.evento_id = ec.id AND rc.estatus != 'cancelado') AS personas,
+           (SELECT COUNT(*) FROM registros_comedor rc WHERE rc.evento_id = ec.id AND rc.estatus = 'pendiente') AS pendientes
+    FROM eventos_comedor ec
+    WHERE activo = TRUE AND fecha >= CURRENT_DATE
+    ORDER BY fecha ASC, hora_inicio ASC
+    LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+$totalRegistrosComedor = (int)$pdo->query("SELECT COUNT(*) FROM registros_comedor WHERE estatus = 'pendiente'")->fetchColumn();
+
 $kpis = [
     "solicitudes"  => count($solicitudesCita),
     "aceptadas"    => count($citasAceptadas),
     "quejas"       => count($quejasPendientes),
     "apoyos_reg"   => count($registrosApoyos),
+    "comedor"      => $totalRegistrosComedor,
 ];
 
 /* Helper: nombre completo */
@@ -252,6 +266,7 @@ function direccion(array $row): string {
       <a href="empleados_queja.php">Quejas</a>
       <a href="empleados_apoyo.php">Apoyos</a>
       <a href="empleados_cita.php">Citas</a>
+      <a href="empleados_comedor.php">Comedor</a>
       <a href="admin_cp.php">Codigos postales</a>
       <a href="logout.php">Cerrar sesión</a>
     </nav>
@@ -299,6 +314,12 @@ function direccion(array $row): string {
       <div class="kpi-card__num"><?php echo $kpis['apoyos_reg']; ?></div>
       <div class="kpi-card__label">Solicitudes de apoyo</div>
     </div>
+    <div class="kpi-card">
+      <div class="kpi-card__num <?php echo $kpis['comedor'] > 0 ? 'warn' : 'ok'; ?>">
+        <?php echo $kpis['comedor']; ?>
+      </div>
+      <div class="kpi-card__label">Comedor pendientes</div>
+    </div>
   </div>
 
   <!-- Botón mantenimiento -->
@@ -333,6 +354,8 @@ function direccion(array $row): string {
     <a href="empleados_apoyo.php"><span class="ql-dot"></span> Gestionar apoyos</a>
     <a href="alta_apoyo.php"><span class="ql-dot"></span> + Dar de alta apoyo</a>
     <a href="exportar_apoyos_excel.php"><span class="ql-dot"></span> Exportar apoyos</a>
+    <a href="empleados_comedor.php"><span class="ql-dot"></span> Comedor Solidario</a>
+    <a href="admin_comedor.php"><span class="ql-dot"></span> + Eventos del comedor</a>
   </div>
 
   <!-- ==============================
@@ -863,6 +886,68 @@ function direccion(array $row): string {
                 <input type="hidden" name="id" value="<?php echo (int)$r["id"]; ?>">
                 <button type="submit" class="btn btn--light">🗑 Eliminar registro</button>
               </form>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  </section>
+
+  <!-- ==============================
+       COMEDOR SOLIDARIO
+  ============================== -->
+  <section class="dashboard-card" style="margin-top:22px;">
+    <div class="calendar-head">
+      <h2>Comedor Solidario
+        <span style="font-size:14px;font-weight:400;color:#6b7280;margin-left:8px;">
+          (próximos eventos)
+        </span>
+      </h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="admin_comedor.php" class="btn">+ Nuevo evento</a>
+        <a href="empleados_comedor.php" class="section-link" style="align-self:center;">Ver registros →</a>
+      </div>
+    </div>
+
+    <div class="list" style="margin-top:18px;">
+      <?php if (empty($proximosComedor)): ?>
+        <div class="list-item">
+          <strong>Sin eventos programados</strong>
+          <div>
+            <a href="admin_comedor.php" style="color:#7A1737;font-weight:600;">Dar de alta un evento</a>
+          </div>
+        </div>
+      <?php else: ?>
+        <?php foreach ($proximosComedor as $ev): ?>
+          <?php
+            $fechaFmt = date("d/m/Y", strtotime($ev["fecha"]));
+            $diasSemana = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+            $dia = $diasSemana[date("w", strtotime($ev["fecha"]))];
+            $hI = substr($ev["hora_inicio"], 0, 5);
+            $hF = substr($ev["hora_fin"], 0, 5);
+          ?>
+          <div class="list-item">
+            <div style="margin-bottom:6px;font-size:13px;font-weight:800;color:#7A1737;">
+              📅 <?php echo htmlspecialchars("$dia $fechaFmt"); ?>
+              &nbsp;·&nbsp;
+              🕐 <?php echo htmlspecialchars("$hI – $hF"); ?>
+            </div>
+
+            <?php if (!empty($ev["lugar"])): ?>
+            <div style="color:#6b7280;font-size:13px;">
+              📍 <?php echo htmlspecialchars($ev["lugar"]); ?>
+            </div>
+            <?php endif; ?>
+
+            <div style="color:#6b7280;font-size:13px;margin-top:4px;">
+              👥 <?php echo (int)$ev["personas"]; ?> persona(s) registrada(s)
+              &nbsp;·&nbsp;
+              ⏳ <?php echo (int)$ev["pendientes"]; ?> pendiente(s)
+            </div>
+
+            <div style="margin-top:10px;">
+              <a href="empleados_comedor.php?evento=<?php echo (int)$ev["id"]; ?>"
+                 class="btn btn--light" style="font-size:12px;padding:6px 14px;">Ver registros</a>
             </div>
           </div>
         <?php endforeach; ?>

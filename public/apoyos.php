@@ -67,6 +67,7 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
       <a href="index.php">Inicio</a>
       <a href="queja.php">Gestión</a>
       <a href="cita.php">Citas</a>
+      <a href="comedor.php">Comedor</a>
     </nav>
   </div>
 </header>

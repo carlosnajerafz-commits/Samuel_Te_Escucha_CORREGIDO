@@ -287,6 +287,12 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
       <a href="apoyos.php" class="btn">Ver apoyos</a>
     </article>
 
+    <article class="feature-card">
+      <h3>Comedor Solidario</h3>
+      <p>Consulta las próximas fechas del comedor y regístrate para asistir con tu familia.</p>
+      <a href="comedor.php" class="btn">Ver fechas</a>
+    </article>
+
   </div>
 </main>
 
