@@ -70,7 +70,7 @@ $diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sába
   <style>
     :root { --guinda: rgb(122,23,55); --bg: #f3f4f6; --border: #e5e7eb; --shadow: 0 14px 38px rgba(17,24,39,.08); }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #1f2937; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #1f2937; display:flex; flex-direction:column; min-height:100vh; }
     a { text-decoration: none; color: inherit; }
 
     /* TOPBAR */
@@ -85,7 +85,7 @@ $diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sába
 
     /* SHELL */
     .wrap { max-width:1200px; margin:0 auto; padding:0 20px; }
-    .page-shell { padding:40px 0 80px; }
+    .page-shell { padding:40px 0 80px; flex:1; }
     .page-header { margin-bottom:30px; }
     .page-header h1 { margin:0 0 8px; color:var(--guinda); font-size:30px; font-weight:800; }
     .page-header p { margin:0; color:#6b7280; font-size:16px; }

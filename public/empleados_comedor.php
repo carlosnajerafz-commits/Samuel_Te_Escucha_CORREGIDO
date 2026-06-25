@@ -7,6 +7,11 @@ if (!isset($_SESSION["empleado_id"])) {
     exit;
 }
 
+// Auto-migración: agrega la columna si aún no existe
+try {
+    $pdo->exec("ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS categoria_vulnerable VARCHAR(150) DEFAULT ''");
+} catch (PDOException $e) { /* ignorar si ya existe o sin permisos */ }
+
 $mensaje = "";
 if (isset($_GET["ok"]) || isset($_GET["actualizado"])) $mensaje = "Registro actualizado correctamente.";
 elseif (isset($_GET["eliminado"]))                      $mensaje = "Registro eliminado correctamente.";
@@ -63,9 +68,19 @@ $sql = "
 ";
 
 $params = array_merge($paramsBusqueda, $paramsEvento);
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$registros = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+try {
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $registros = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+} catch (PDOException $e) {
+    // Fallback si la columna categoria_vulnerable aún no existe en la BD
+    $sqlFallback = str_replace("r.categoria_vulnerable, ", "", $sql);
+    $stmt = $pdo->prepare($sqlFallback);
+    $stmt->execute($params);
+    $registros = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    foreach ($registros as &$row) $row["categoria_vulnerable"] = "";
+    unset($row);
+}
 
 // Lista de eventos para el filtro
 $eventosLista = $pdo->query("
@@ -132,7 +147,7 @@ function nombreCompleto(array $row): string {
     .badge--categoria { background:#f3e8ff; color:#6b21a8; }
   </style>
 </head>
-<body>
+<body class="sticky-footer-page">
 
 <header class="topbar">
   <div class="wrap topbar__inner">
@@ -155,7 +170,7 @@ function nombreCompleto(array $row): string {
   </div>
 </header>
 
-<main class="wrap page-shell">
+<main class="wrap page-shell sticky-footer-main">
   <div class="page-header">
     <h1>Comedor Solidario — Registros</h1>
     <p>Gestiona las inscripciones al Comedor Solidario.</p>

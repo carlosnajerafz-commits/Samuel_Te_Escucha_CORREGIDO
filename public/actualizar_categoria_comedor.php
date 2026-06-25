@@ -12,6 +12,10 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
+try {
+    $pdo->exec("ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS categoria_vulnerable VARCHAR(150) DEFAULT ''");
+} catch (PDOException $e) { /* ignorar */ }
+
 $id        = (int)($_POST["id"] ?? 0);
 $categoria = trim($_POST["categoria_vulnerable"] ?? "");
 
