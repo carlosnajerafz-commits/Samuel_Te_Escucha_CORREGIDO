@@ -1,6 +1,16 @@
 -- Migración: Comedor Solidario
 -- Ejecutar en la base de datos existente
 
+-- Si la tabla registros_comedor ya existe, agregar columnas de dirección
+ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS seccion_electoral VARCHAR(10) DEFAULT '';
+ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS categoria_vulnerable VARCHAR(150) DEFAULT '';
+ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS calle VARCHAR(150) DEFAULT '';
+ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS no_exterior VARCHAR(20) DEFAULT '';
+ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS no_interior VARCHAR(20) DEFAULT '';
+ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS colonia VARCHAR(150) DEFAULT '';
+ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS municipio VARCHAR(150) DEFAULT '';
+ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS codigo_postal VARCHAR(10) DEFAULT '';
+
 CREATE TABLE IF NOT EXISTS eventos_comedor (
     id SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
@@ -32,6 +42,7 @@ CREATE TABLE IF NOT EXISTS registros_comedor (
     municipio VARCHAR(150) DEFAULT '',
     codigo_postal VARCHAR(10) DEFAULT '',
     numero_personas INT DEFAULT 1,
+    categoria_vulnerable VARCHAR(150) DEFAULT '',
     observaciones TEXT DEFAULT '',
     estatus VARCHAR(20) NOT NULL DEFAULT 'pendiente',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

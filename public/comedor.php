@@ -145,9 +145,11 @@ $diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sába
     .sin-eventos h3 { color:#374151; margin-bottom:8px; font-size:20px; }
 
     /* FOOTER */
-    .footer { background:#fff; border-top:1px solid var(--border); padding:0 20px; }
-    .footer-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; min-height:62px; flex-wrap:wrap; gap:10px; }
-    .footer-logo { height:32px; object-fit:contain; }
+    .footer { background:var(--guinda); padding:0 20px; }
+    .footer-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; min-height:62px; flex-wrap:wrap; gap:10px; color:#fff; font-size:14px; }
+    .footer-logo { height:32px; object-fit:contain; filter:brightness(0) invert(1); }
+    .footer a { color:rgba(255,255,255,.85); }
+    .footer a:hover { color:#fff; }
 
     @media (max-width:900px) {
       .form-grid { grid-template-columns:1fr 1fr; }

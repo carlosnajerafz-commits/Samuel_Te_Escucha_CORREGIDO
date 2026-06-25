@@ -52,7 +52,7 @@ $sql = "
            r.celular_1, r.celular_2, r.correo,
            r.seccion_electoral, r.calle, r.no_exterior, r.no_interior,
            r.colonia, r.municipio, r.codigo_postal,
-           r.numero_personas, r.observaciones, r.estatus, r.created_at,
+           r.numero_personas, r.categoria_vulnerable, r.observaciones, r.estatus, r.created_at,
            e.fecha, e.hora_inicio, e.hora_fin, e.lugar
     FROM registros_comedor r
     LEFT JOIN eventos_comedor e ON e.id = r.evento_id
@@ -123,6 +123,13 @@ function nombreCompleto(array $row): string {
     }
     .registro-card__info { font-size:13px; color:#6b7280; margin-top:3px; }
     .registro-card__actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .categoria-row { display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
+    .categoria-row label { font-size:12px; font-weight:700; color:#374151; white-space:nowrap; }
+    .categoria-select { border:1px solid #d1d5db; border-radius:8px; padding:5px 10px; font-size:12px; color:#374151; background:#fff; min-width:220px; }
+    .categoria-select:focus { outline:none; border-color:#7A1737; box-shadow:0 0 0 3px rgba(122,23,55,.08); }
+    .btn-cat { background:#7A1737; color:#fff; border:none; border-radius:8px; padding:5px 14px; font-size:12px; font-weight:700; cursor:pointer; }
+    .btn-cat:hover { opacity:.85; }
+    .badge--categoria { background:#f3e8ff; color:#6b21a8; }
   </style>
 </head>
 <body>
@@ -254,6 +261,53 @@ function nombreCompleto(array $row): string {
         <div class="registro-card__info" style="font-size:12px;color:#9ca3af;">
           Registrado: <?php echo htmlspecialchars($r["created_at"]); ?>
         </div>
+
+        <?php if (!empty($r["categoria_vulnerable"])): ?>
+          <div class="registro-card__info">
+            <span class="badge badge--categoria">🏷️ <?php echo htmlspecialchars($r["categoria_vulnerable"]); ?></span>
+          </div>
+        <?php endif; ?>
+
+        <!-- Selector de categoría vulnerable -->
+        <?php
+          $qActual = http_build_query(array_filter([
+            "evento"  => $_GET["evento"]  ?? null,
+            "filtro"  => $_GET["filtro"]  ?? null,
+            "buscar"  => $_GET["buscar"]  ?? null,
+          ]));
+        ?>
+        <form method="POST" action="actualizar_categoria_comedor.php" class="categoria-row">
+          <input type="hidden" name="id" value="<?php echo (int)$r["id"]; ?>">
+          <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($qActual); ?>">
+          <label>Categoría:</label>
+          <select name="categoria_vulnerable" class="categoria-select">
+            <option value="">— Sin categoría —</option>
+            <?php
+              $categorias = [
+                "Adultos mayores",
+                "Personas con discapacidad",
+                "Madres solteras y jefas de familia",
+                "Niñas, niños y adolescentes",
+                "Personas en situación de pobreza",
+                "Personas desempleadas",
+                "Personas en situación de calle",
+                "Personas migrantes",
+                "Personas cuidadoras sin ingresos suficientes",
+                "Familias en situación de vulnerabilidad económica",
+                "Personas con enfermedades que les impidan trabajar",
+                "Víctimas de violencia o desplazamiento",
+                "Comunidades indígenas en situación de marginación",
+              ];
+              foreach ($categorias as $cat):
+                $sel = ($r["categoria_vulnerable"] ?? "") === $cat ? "selected" : "";
+            ?>
+              <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo $sel; ?>>
+                <?php echo htmlspecialchars($cat); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+          <button type="submit" class="btn-cat">Guardar</button>
+        </form>
 
         <div class="registro-card__actions">
           <?php if ($r["estatus"] === "pendiente"): ?>
