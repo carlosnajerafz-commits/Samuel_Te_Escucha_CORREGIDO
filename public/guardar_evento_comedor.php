@@ -1,6 +1,8 @@
 <?php
-session_start();
+require_once "includes/session.php";
 require_once "db.php";
+require_once "includes/csrf.php";
+csrf_validate('admin_comedor.php');
 
 if (!isset($_SESSION["empleado_id"])) {
     header("Location: login.php");

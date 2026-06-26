@@ -1,6 +1,8 @@
 <?php
-session_start();
+require_once "includes/session.php";
 require_once "db.php";
+require_once "includes/security_headers.php";
+require_once "includes/csrf.php";
 
 if (!isset($_SESSION["empleado_id"])) {
     header("Location: login.php");
@@ -123,6 +125,7 @@ $eventosHistorial = $pdo->query("
   <section class="form-card" style="margin-bottom:32px;">
     <h2 style="margin-bottom:20px;font-size:18px;color:#7A1737;">Agregar nuevo evento</h2>
     <form method="POST" action="guardar_evento_comedor.php">
+      <?php echo csrf_field(); ?>
       <div class="form-grid">
 
         <div class="form-group">
@@ -251,6 +254,7 @@ $eventosHistorial = $pdo->query("
               <a href="empleados_comedor.php?evento=<?php echo (int)$ev["id"]; ?>"
                  class="btn btn--light" style="font-size:13px;padding:6px 14px;">Ver registros</a>
               <form method="POST" action="eliminar_evento_comedor.php" style="margin:0;">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id" value="<?php echo (int)$ev["id"]; ?>">
                 <input type="hidden" name="accion" value="<?php echo $ev["activo"] ? 'desactivar' : 'activar'; ?>">
                 <button type="submit" class="btn btn--light" style="font-size:13px;padding:6px 14px;">
@@ -259,6 +263,7 @@ $eventosHistorial = $pdo->query("
               </form>
               <form method="POST" action="eliminar_evento_comedor.php" style="margin:0;"
                     onsubmit="return confirm('¿Eliminar este evento y todos sus registros?');">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id" value="<?php echo (int)$ev["id"]; ?>">
                 <input type="hidden" name="accion" value="eliminar">
                 <button type="submit" class="btn btn--light" style="font-size:13px;padding:6px 14px;">🗑 Eliminar</button>
@@ -303,6 +308,7 @@ $eventosHistorial = $pdo->query("
                class="btn btn--light" style="font-size:13px;padding:6px 14px;">Ver registros</a>
             <form method="POST" action="eliminar_evento_comedor.php" style="margin:0;"
                   onsubmit="return confirm('¿Eliminar este evento?');">
+              <?php echo csrf_field(); ?>
               <input type="hidden" name="id" value="<?php echo (int)$ev["id"]; ?>">
               <input type="hidden" name="accion" value="eliminar">
               <button type="submit" class="btn btn--light" style="font-size:13px;padding:6px 14px;">🗑 Eliminar</button>
