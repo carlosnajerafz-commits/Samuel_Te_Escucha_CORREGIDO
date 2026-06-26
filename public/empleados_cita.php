@@ -1,11 +1,11 @@
 <?php
-session_start();
+require_once "includes/session.php";
+require_once "includes/security_headers.php";
+require_once "includes/auth.php";
+require_once "includes/csrf.php";
 require_once "db.php";
 
-if (!isset($_SESSION["empleado_id"])) {
-    header("Location: login.php");
-    exit;
-}
+require_auth();
 
 /* =========================================
    FILTRO DE TIEMPO
@@ -421,6 +421,7 @@ $coloresJson = json_encode($colores);
 
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
               <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id"     value="<?php echo (int)($cita["id"] ?? 0); ?>">
                 <input type="hidden" name="estatus" value="aceptada">
                 <input type="hidden" name="origen"  value="citas">
@@ -428,6 +429,7 @@ $coloresJson = json_encode($colores);
               </form>
 
               <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id"     value="<?php echo (int)($cita["id"] ?? 0); ?>">
                 <input type="hidden" name="estatus" value="rechazada">
                 <input type="hidden" name="origen"  value="citas">
@@ -516,6 +518,7 @@ $coloresJson = json_encode($colores);
 
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
               <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id"     value="<?php echo (int)($cita["id"] ?? 0); ?>">
                 <input type="hidden" name="estatus" value="realizada">
                 <input type="hidden" name="origen"  value="citas">
@@ -523,6 +526,7 @@ $coloresJson = json_encode($colores);
               </form>
 
               <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id"     value="<?php echo (int)($cita["id"] ?? 0); ?>">
                 <input type="hidden" name="estatus" value="cancelada">
                 <input type="hidden" name="origen"  value="citas">
@@ -612,6 +616,7 @@ $coloresJson = json_encode($colores);
             <div style="margin-top:12px;">
               <form method="POST" action="eliminar_cita.php" style="margin:0;"
                     onsubmit="return confirm('¿Eliminar esta cita del historial?');">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id"    value="<?php echo (int)($cita["id"] ?? 0); ?>">
                 <input type="hidden" name="origen" value="citas">
                 <button type="submit" class="btn btn--light">🗑 Eliminar cita</button>
@@ -638,6 +643,7 @@ $coloresJson = json_encode($colores);
     <?php endif; ?>
 
     <form method="POST" action="guardar_bloqueo.php" id="formBloqueo">
+      <?php echo csrf_field(); ?>
       <div class="bloqueo-form-grid">
 
         <div class="form-group">
@@ -750,7 +756,8 @@ $coloresJson = json_encode($colores);
             <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
               <?php if ($esDiaCompleto): ?>
                 <form method="POST" action="eliminar_bloqueo.php" style="margin:0;"
-                      onsubmit="return confirm('¿Eliminar bloqueo del día <?php echo addslashes($fDisplay); ?>?');">
+                      onsubmit="return confirm('¿Eliminar bloqueo del día ' + <?php echo json_encode($fDisplay); ?> + '?');">
+                  <?php echo csrf_field(); ?>
                   <input type="hidden" name="bloqueo_id" value="<?php echo (int)$registros[0]["id"]; ?>">
                   <button type="submit" class="btn btn--light" style="font-size:12px;padding:5px 12px;">
                     🗑 Eliminar día
@@ -759,7 +766,8 @@ $coloresJson = json_encode($colores);
               <?php else: ?>
                 <?php foreach ($registros as $reg): ?>
                   <form method="POST" action="eliminar_bloqueo.php" style="margin:0;"
-                        onsubmit="return confirm('¿Eliminar el bloqueo de las <?php echo addslashes(substr((string)$reg["hora"],0,5)); ?>?');">
+                        onsubmit="return confirm('¿Eliminar el bloqueo de las ' + <?php echo json_encode(substr((string)$reg["hora"], 0, 5)); ?> + '?');">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="bloqueo_id" value="<?php echo (int)$reg["id"]; ?>">
                     <button type="submit" class="btn btn--light" style="font-size:12px;padding:5px 12px;">
                       🗑 <?php echo htmlspecialchars(substr((string)$reg["hora"], 0, 5)); ?>

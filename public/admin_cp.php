@@ -1,11 +1,11 @@
 <?php
-session_start();
+require_once "includes/session.php";
+require_once "includes/security_headers.php";
+require_once "includes/auth.php";
+require_once "includes/csrf.php";
 require_once "db.php";
 
-if (!isset($_SESSION["empleado_id"])) {
-    header("Location: login.php");
-    exit;
-}
+require_auth();
 
 /* =========================================
    BÚSQUEDA POR CP
@@ -230,6 +230,7 @@ if (isset($_GET["ok"])) {
     </p>
 
     <form method="POST" action="guardar_cp.php">
+      <?php echo csrf_field(); ?>
       <input type="hidden" name="accion" value="agregar">
       <div class="form-inline">
         <div class="form-group">
@@ -314,6 +315,7 @@ if (isset($_GET["ok"])) {
               <td>
                 <form method="POST" action="guardar_cp.php" style="margin:0;"
                       onsubmit="return confirm('¿Eliminar la colonia «<?php echo htmlspecialchars($row["colonia"]); ?>»?');">
+                  <?php echo csrf_field(); ?>
                   <input type="hidden" name="accion"     value="eliminar">
                   <input type="hidden" name="id"         value="<?php echo (int)$row["id"]; ?>">
                   <input type="hidden" name="cp_retorno" value="<?php echo htmlspecialchars($buscarCp); ?>">

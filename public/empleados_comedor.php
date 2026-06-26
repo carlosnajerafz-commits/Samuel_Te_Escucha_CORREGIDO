@@ -1,11 +1,11 @@
 <?php
-session_start();
+require_once "includes/session.php";
+require_once "includes/security_headers.php";
+require_once "includes/auth.php";
+require_once "includes/csrf.php";
 require_once "db.php";
 
-if (!isset($_SESSION["empleado_id"])) {
-    header("Location: login.php");
-    exit;
-}
+require_auth();
 
 // Auto-migración: agrega la columna si aún no existe
 try {
@@ -292,6 +292,7 @@ function nombreCompleto(array $row): string {
           ]));
         ?>
         <form method="POST" action="actualizar_categoria_comedor.php" class="categoria-row">
+          <?php echo csrf_field(); ?>
           <input type="hidden" name="id" value="<?php echo (int)$r["id"]; ?>">
           <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($qActual); ?>">
           <label>Categoría:</label>
@@ -327,11 +328,13 @@ function nombreCompleto(array $row): string {
         <div class="registro-card__actions">
           <?php if ($r["estatus"] === "pendiente"): ?>
             <form method="POST" action="actualizar_estatus_comedor.php" style="margin:0;">
+              <?php echo csrf_field(); ?>
               <input type="hidden" name="id" value="<?php echo (int)$r["id"]; ?>">
               <input type="hidden" name="estatus" value="confirmado">
               <button type="submit" class="btn" style="font-size:12px;padding:6px 14px;">✔ Confirmar</button>
             </form>
             <form method="POST" action="actualizar_estatus_comedor.php" style="margin:0;">
+              <?php echo csrf_field(); ?>
               <input type="hidden" name="id" value="<?php echo (int)$r["id"]; ?>">
               <input type="hidden" name="estatus" value="cancelado">
               <button type="submit" class="btn btn--light" style="font-size:12px;padding:6px 14px;"
@@ -339,11 +342,13 @@ function nombreCompleto(array $row): string {
             </form>
           <?php elseif ($r["estatus"] === "confirmado"): ?>
             <form method="POST" action="actualizar_estatus_comedor.php" style="margin:0;">
+              <?php echo csrf_field(); ?>
               <input type="hidden" name="id" value="<?php echo (int)$r["id"]; ?>">
               <input type="hidden" name="estatus" value="asistio">
               <button type="submit" class="btn" style="font-size:12px;padding:6px 14px;">✔ Asistió</button>
             </form>
             <form method="POST" action="actualizar_estatus_comedor.php" style="margin:0;">
+              <?php echo csrf_field(); ?>
               <input type="hidden" name="id" value="<?php echo (int)$r["id"]; ?>">
               <input type="hidden" name="estatus" value="cancelado">
               <button type="submit" class="btn btn--light" style="font-size:12px;padding:6px 14px;"
@@ -352,6 +357,7 @@ function nombreCompleto(array $row): string {
           <?php endif; ?>
           <form method="POST" action="eliminar_registro_comedor.php" style="margin:0;"
                 onsubmit="return confirm('¿Eliminar este registro?');">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="id" value="<?php echo (int)$r["id"]; ?>">
             <button type="submit" class="btn btn--light" style="font-size:12px;padding:6px 14px;">🗑 Eliminar</button>
           </form>

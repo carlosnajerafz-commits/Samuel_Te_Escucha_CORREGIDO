@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . "/includes/security_headers.php";
+require_once __DIR__ . "/includes/session.php";
 require_once "db.php";
 
 $stmt   = $pdo->query("SELECT id, nombre, descripcion FROM apoyos WHERE activo = TRUE ORDER BY created_at DESC");

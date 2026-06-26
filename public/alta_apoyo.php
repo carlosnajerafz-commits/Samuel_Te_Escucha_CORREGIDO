@@ -1,15 +1,16 @@
 <?php
-session_start();
+require_once "includes/session.php";
+require_once "includes/security_headers.php";
+require_once "includes/auth.php";
+require_once "includes/csrf.php";
 require_once "db.php";
 
-if (!isset($_SESSION["empleado_id"])) {
-    header("Location: login.php");
-    exit;
-}
+require_auth();
 
 $mensaje = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    csrf_validate('alta_apoyo.php');
     $nombre = trim($_POST["nombre"] ?? "");
     $descripcion = trim($_POST["descripcion"] ?? "");
 
@@ -69,6 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   <section class="form-card">
     <form method="POST">
+      <?php echo csrf_field(); ?>
       <div class="form-grid">
         <div class="form-group form-group--full">
           <label>Nombre del apoyo</label>

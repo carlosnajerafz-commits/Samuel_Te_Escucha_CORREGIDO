@@ -1,11 +1,11 @@
 <?php
-session_start();
+require_once "includes/session.php";
+require_once "includes/security_headers.php";
+require_once "includes/auth.php";
+require_once "includes/csrf.php";
 require_once "db.php";
 
-if (!isset($_SESSION["empleado_id"])) {
-    header("Location: login.php");
-    exit;
-}
+require_auth();
 
 /* =========================================
    FILTRO DE TIEMPO
@@ -382,12 +382,14 @@ $coloresJson = json_encode($colores);
 
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
               <form method="POST" action="actualizar_estatus_queja.php" style="margin:0;">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id"     value="<?php echo (int)($queja["id"] ?? 0); ?>">
                 <input type="hidden" name="estatus" value="atendida">
                 <button type="submit" class="btn">Marcar atendida</button>
               </form>
 
               <form method="POST" action="actualizar_estatus_queja.php" style="margin:0;">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id"     value="<?php echo (int)($queja["id"] ?? 0); ?>">
                 <input type="hidden" name="estatus" value="completada">
                 <button type="submit" class="btn">Completar</button>
@@ -498,6 +500,7 @@ $coloresJson = json_encode($colores);
             <div style="margin-top:12px;">
               <form method="POST" action="eliminar_queja.php" style="margin:0;"
                     onsubmit="return confirm('¿Seguro que deseas eliminar esta queja?');">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id" value="<?php echo (int)($queja["id"] ?? 0); ?>">
                 <button type="submit" class="btn btn--light">🗑 Eliminar queja</button>
               </form>

@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . "/includes/security_headers.php";
+require_once __DIR__ . "/includes/session.php";
+
 $mostrarModal = false;
 $modalTitulo  = "";
 $modalMensaje = "";

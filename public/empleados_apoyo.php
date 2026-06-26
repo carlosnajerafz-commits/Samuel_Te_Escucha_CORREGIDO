@@ -1,11 +1,11 @@
 <?php
-session_start();
+require_once "includes/session.php";
+require_once "includes/security_headers.php";
+require_once "includes/auth.php";
+require_once "includes/csrf.php";
 require_once "db.php";
 
-if (!isset($_SESSION["empleado_id"])) {
-    header("Location: login.php");
-    exit;
-}
+require_auth();
 
 /* =========================================
    FILTRO DE TIEMPO
@@ -384,6 +384,7 @@ $totalApoyosTipo = count($apoyosActivos);
               <td>
                 <form method="POST" action="eliminar_apoyo.php" style="margin:0;"
                       onsubmit="return confirm('¿Seguro que deseas eliminar este apoyo?');">
+                  <?php echo csrf_field(); ?>
                   <input type="hidden" name="id" value="<?php echo (int)($apoyo["id"] ?? 0); ?>">
                   <button type="submit" class="btn btn--light" style="font-size:12px;padding:5px 12px;">
                     🗑 Eliminar
@@ -544,6 +545,7 @@ $totalApoyosTipo = count($apoyosActivos);
             <div style="margin-top:14px;">
               <form method="POST" action="eliminar_registro_apoyo.php" style="margin:0;"
                     onsubmit="return confirm('¿Seguro que deseas eliminar este registro?');">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id" value="<?php echo (int)($r["id"] ?? 0); ?>">
                 <button type="submit" class="btn btn--light">🗑 Eliminar registro</button>
               </form>

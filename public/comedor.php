@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . "/includes/security_headers.php";
+require_once __DIR__ . "/includes/session.php";
 require_once "db.php";
 
 // Verificar modo mantenimiento

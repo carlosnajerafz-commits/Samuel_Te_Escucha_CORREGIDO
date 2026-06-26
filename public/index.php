@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . "/includes/security_headers.php";
+require_once __DIR__ . "/includes/session.php";
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
