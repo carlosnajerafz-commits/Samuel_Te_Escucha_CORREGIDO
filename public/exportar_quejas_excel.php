@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "includes/session.php";
 require_once "db.php";
 
 if (!isset($_SESSION["empleado_id"])) {
@@ -16,7 +16,6 @@ $sql = "
         celular_1,
         celular_2,
         correo,
-        seccion_electoral,
         calle,
         no_exterior,
         no_interior,
@@ -24,7 +23,6 @@ $sql = "
         municipio,
         codigo_postal,
         tipo,
-        direccion,
         evidencia_path,
         created_at,
         estatus
@@ -51,7 +49,6 @@ fputcsv($output, [
     'Celular 1',
     'Celular 2',
     'Correo',
-    'Sección Electoral',
     'Calle',
     'No Exterior',
     'No Interior',
@@ -59,7 +56,6 @@ fputcsv($output, [
     'Municipio',
     'Código Postal',
     'Tipo',
-    'Dirección',
     'Evidencia',
     'Fecha Registro',
     'Estatus'
@@ -77,7 +73,6 @@ foreach ($quejas as $q) {
         $q['celular_1'],
         $q['celular_2'],
         $q['correo'],
-        $q['seccion_electoral'],
         $q['calle'],
         $q['no_exterior'],
         $q['no_interior'],
@@ -85,7 +80,6 @@ foreach ($quejas as $q) {
         $q['municipio'],
         $q['codigo_postal'],
         $q['tipo'],
-        $q['direccion'],
         $q['evidencia_path'],
         $q['created_at'],
         $q['estatus']

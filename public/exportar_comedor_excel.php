@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "includes/session.php";
 require_once "db.php";
 
 if (!isset($_SESSION["empleado_id"])) {
@@ -14,7 +14,7 @@ $sql = "
     SELECT r.id, e.fecha, e.hora_inicio, e.lugar,
            r.nombre, r.apellido_paterno, r.apellido_materno,
            r.celular_1, r.celular_2, r.correo,
-           r.seccion_electoral, r.calle, r.no_exterior, r.no_interior,
+           r.calle, r.no_exterior, r.no_interior,
            r.colonia, r.municipio, r.codigo_postal,
            r.numero_personas, r.observaciones, r.estatus, r.created_at
     FROM registros_comedor r
@@ -41,7 +41,7 @@ fputcsv($out, [
     "ID", "Fecha Evento", "Hora", "Lugar",
     "Nombre", "Apellido Paterno", "Apellido Materno",
     "Celular 1", "Celular 2", "Correo",
-    "Sección Electoral", "Calle", "No. Ext", "No. Int",
+    "Calle", "No. Ext", "No. Int",
     "Colonia", "Municipio", "CP",
     "Núm. Personas", "Observaciones", "Estatus", "Fecha Registro"
 ]);
@@ -58,7 +58,6 @@ foreach ($registros as $r) {
         $r["celular_1"],
         $r["celular_2"],
         $r["correo"],
-        $r["seccion_electoral"],
         $r["calle"],
         $r["no_exterior"],
         $r["no_interior"],

@@ -23,9 +23,11 @@ if (isset($_GET["ok"])) {
 if (isset($_GET["error"])) {
     $mostrarModal = true;
     $modalTitulo  = "Error";
-    $modalMensaje = $_GET["error"] === "celular"
-        ? "Los dos números celulares deben tener exactamente 10 dígitos."
-        : "No fue posible registrar tu solicitud. Verifica los datos e inténtalo de nuevo.";
+    $modalMensaje = match($_GET["error"]) {
+        "limite"  => "Ya enviaste 3 solicitudes de apoyo en la última hora. Por favor espera un momento antes de intentar de nuevo.",
+        "celular" => "Los dos números celulares deben tener exactamente 10 dígitos.",
+        default   => "No fue posible registrar tu solicitud. Verifica los datos e inténtalo de nuevo.",
+    };
     $modalTipo = "error";
 }
 

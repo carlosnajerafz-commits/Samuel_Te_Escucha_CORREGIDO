@@ -53,12 +53,6 @@ $badgeClass = "badge--" . $estatus;
     </div>
   <?php endif; ?>
 
-  <?php if (!empty($queja["seccion_electoral"])): ?>
-    <div style="color:#6b7280;font-size:13px;margin-top:2px;">
-      🗳️ Sección: <?php echo htmlspecialchars($queja["seccion_electoral"]); ?>
-    </div>
-  <?php endif; ?>
-
   <?php if (!empty($queja["descripcion"])): ?>
     <div style="color:#6b7280;font-size:13px;margin-top:4px;">
       📝 <?php echo htmlspecialchars($queja["descripcion"]); ?>

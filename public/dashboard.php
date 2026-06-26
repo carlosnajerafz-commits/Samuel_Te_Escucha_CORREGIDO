@@ -1,6 +1,8 @@
 <?php
-session_start();
+require_once "includes/session.php";
 require_once "db.php";
+require_once "includes/security_headers.php";
+require_once "includes/csrf.php";
 
 if (!isset($_SESSION["empleado_id"])) {
     header("Location: login.php");
@@ -64,7 +66,7 @@ $historialCitas = $pdo->query("
 
 $quejasPendientes = $pdo->query("
     SELECT id, nombre, apellido_paterno, apellido_materno,
-           celular_1, celular_2, correo, seccion_electoral,
+           celular_1, celular_2, correo,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
            tipo, descripcion, evidencia_path, created_at, estatus
     FROM quejas WHERE estatus = 'pendiente'
@@ -73,7 +75,7 @@ $quejasPendientes = $pdo->query("
 
 $historialQuejas = $pdo->query("
     SELECT id, nombre, apellido_paterno, apellido_materno,
-           celular_1, celular_2, correo, seccion_electoral,
+           celular_1, celular_2, correo,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
            tipo, descripcion, evidencia_path, created_at, estatus
     FROM quejas WHERE estatus IN ('atendida','cerrada','completada')
@@ -88,7 +90,7 @@ $apoyosActivos = $pdo->query("
 
 $registrosApoyos = $pdo->query("
     SELECT id, apoyo, nombre, apellido_paterno, apellido_materno,
-           celular_1, celular_2, correo, seccion_electoral,
+           celular_1, celular_2, correo,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
            ine_path, observaciones, estatus, created_at
     FROM registros_apoyos
@@ -325,6 +327,7 @@ function direccion(array $row): string {
   <!-- Botón mantenimiento -->
 <div style="margin-bottom:24px;">
   <form method="POST" action="toggle_maintenance.php" style="margin:0;">
+    <?php echo csrf_field(); ?>
     <?php if ($enMantenimiento): ?>
       <button type="submit" class="btn"
               style="background:#166534;display:flex;align-items:center;gap:8px;"
@@ -419,11 +422,13 @@ function direccion(array $row): string {
 
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
               <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id"     value="<?php echo (int)$item["id"]; ?>">
                 <input type="hidden" name="estatus" value="aceptada">
                 <button type="submit" class="btn">✔ Aceptar</button>
               </form>
               <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id"     value="<?php echo (int)$item["id"]; ?>">
                 <input type="hidden" name="estatus" value="rechazada">
                 <button type="submit" class="btn btn--light"
@@ -496,11 +501,13 @@ function direccion(array $row): string {
 
                   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
                     <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+                      <?php echo csrf_field(); ?>
                       <input type="hidden" name="id"     value="<?php echo (int)$item["id"]; ?>">
                       <input type="hidden" name="estatus" value="realizada">
                       <button type="submit" class="btn" style="font-size:12px;padding:6px 14px;">✔ Realizada</button>
                     </form>
                     <form method="POST" action="actualizar_estatus_cita.php" style="margin:0;">
+                      <?php echo csrf_field(); ?>
                       <input type="hidden" name="id"     value="<?php echo (int)$item["id"]; ?>">
                       <input type="hidden" name="estatus" value="cancelada">
                       <button type="submit" class="btn btn--light" style="font-size:12px;padding:6px 14px;"
@@ -581,11 +588,13 @@ function direccion(array $row): string {
 
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
                 <form method="POST" action="actualizar_estatus_queja.php" style="margin:0;">
+                  <?php echo csrf_field(); ?>
                   <input type="hidden" name="id"     value="<?php echo (int)$queja["id"]; ?>">
                   <input type="hidden" name="estatus" value="atendida">
                   <button type="submit" class="btn" style="font-size:12px;padding:6px 14px;">Atender</button>
                 </form>
                 <form method="POST" action="actualizar_estatus_queja.php" style="margin:0;">
+                  <?php echo csrf_field(); ?>
                   <input type="hidden" name="id"     value="<?php echo (int)$queja["id"]; ?>">
                   <input type="hidden" name="estatus" value="cerrada">
                   <button type="submit" class="btn btn--light" style="font-size:12px;padding:6px 14px;"
@@ -659,6 +668,7 @@ function direccion(array $row): string {
             <div style="margin-top:12px;">
               <form method="POST" action="eliminar_cita.php" style="margin:0;"
                     onsubmit="return confirm('¿Eliminar esta cita del historial?');">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id" value="<?php echo (int)$cita["id"]; ?>">
                 <button type="submit" class="btn btn--light">🗑 Eliminar</button>
               </form>
@@ -731,6 +741,7 @@ function direccion(array $row): string {
             <div style="margin-top:12px;">
               <form method="POST" action="eliminar_queja.php" style="margin:0;"
                     onsubmit="return confirm('¿Eliminar esta queja del historial?');">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id" value="<?php echo (int)$queja["id"]; ?>">
                 <button type="submit" class="btn btn--light">🗑 Eliminar</button>
               </form>
@@ -781,6 +792,7 @@ function direccion(array $row): string {
             <div style="margin-top:12px;">
               <form method="POST" action="eliminar_apoyo.php" style="margin:0;"
                     onsubmit="return confirm('¿Eliminar este apoyo?');">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id" value="<?php echo (int)$apoyo["id"]; ?>">
                 <button type="submit" class="btn btn--light">🗑 Eliminar</button>
               </form>
@@ -883,6 +895,7 @@ function direccion(array $row): string {
             <div style="margin-top:12px;">
               <form method="POST" action="eliminar_registro_apoyo.php" style="margin:0;"
                     onsubmit="return confirm('¿Eliminar este registro de apoyo?');">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="id" value="<?php echo (int)$r["id"]; ?>">
                 <button type="submit" class="btn btn--light">🗑 Eliminar registro</button>
               </form>

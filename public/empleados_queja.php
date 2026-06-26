@@ -67,7 +67,7 @@ if (isset($_GET["ok"])) {
 ========================================= */
 $sqlQuejasPendientes = "
     SELECT id, nombre, apellido_paterno, apellido_materno,
-           celular_1, celular_2, correo, seccion_electoral,
+           celular_1, celular_2, correo,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
            tipo, descripcion, evidencia_path, created_at, estatus
     FROM quejas
@@ -86,7 +86,7 @@ $quejasPendientes = $stmtQuejasPendientes->fetchAll(PDO::FETCH_ASSOC) ?: [];
 ========================================= */
 $sqlHistorialQuejas = "
     SELECT id, nombre, apellido_paterno, apellido_materno,
-           celular_1, celular_2, correo, seccion_electoral,
+           celular_1, celular_2, correo,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
            tipo, descripcion, evidencia_path, created_at, estatus
     FROM quejas
@@ -343,11 +343,6 @@ $coloresJson = json_encode($colores);
             </div>
             <?php endif; ?>
 
-            <?php if (!empty($queja["seccion_electoral"])): ?>
-            <div style="margin-top:4px;color:#6b7280;font-size:13px;">
-              🗳 Sección electoral: <?php echo htmlspecialchars($queja["seccion_electoral"]); ?>
-            </div>
-            <?php endif; ?>
 
             <?php
               $direccion = trim(
@@ -460,11 +455,6 @@ $coloresJson = json_encode($colores);
             </div>
             <?php endif; ?>
 
-            <?php if (!empty($queja["seccion_electoral"])): ?>
-            <div style="margin-top:4px;color:#6b7280;font-size:13px;">
-              🗳 Sección electoral: <?php echo htmlspecialchars($queja["seccion_electoral"]); ?>
-            </div>
-            <?php endif; ?>
 
             <?php
               $direccion = trim(

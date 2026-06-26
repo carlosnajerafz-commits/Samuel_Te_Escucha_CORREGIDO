@@ -55,7 +55,7 @@ if ($filtroEvento > 0) {
 $sql = "
     SELECT r.id, r.evento_id, r.nombre, r.apellido_paterno, r.apellido_materno,
            r.celular_1, r.celular_2, r.correo,
-           r.seccion_electoral, r.calle, r.no_exterior, r.no_interior,
+           r.calle, r.no_exterior, r.no_interior,
            r.colonia, r.municipio, r.codigo_postal,
            r.numero_personas, r.categoria_vulnerable, r.observaciones, r.estatus, r.created_at,
            e.fecha, e.hora_inicio, e.hora_fin, e.lugar
@@ -265,9 +265,6 @@ function nombreCompleto(array $row): string {
           <div class="registro-card__info">🏠 <?php echo htmlspecialchars($dir); ?></div>
         <?php endif; ?>
 
-        <?php if (!empty($r["seccion_electoral"])): ?>
-          <div class="registro-card__info">🗳️ Sección: <?php echo htmlspecialchars($r["seccion_electoral"]); ?></div>
-        <?php endif; ?>
 
         <?php if (!empty($r["observaciones"])): ?>
           <div class="registro-card__info">📝 <?php echo htmlspecialchars($r["observaciones"]); ?></div>

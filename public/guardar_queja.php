@@ -1,10 +1,13 @@
 <?php
 require_once "db.php";
+require_once "includes/rate_limit.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: queja.php?error=1");
     exit;
 }
+
+rate_limit_or_redirect($pdo, 'queja', 3, 3600, 'queja.php?error=limite');
 
 $nombre = trim($_POST["nombre"] ?? "");
 $apellido_paterno = trim($_POST["apellido_paterno"] ?? "");
@@ -12,7 +15,6 @@ $apellido_materno = trim($_POST["apellido_materno"] ?? "");
 $celular_1 = trim($_POST["celular_1"] ?? "");
 $celular_2 = trim($_POST["celular_2"] ?? "");
 $correo = trim($_POST["correo"] ?? "");
-$seccion_electoral = trim($_POST["seccion_electoral"] ?? "");
 $calle = trim($_POST["calle"] ?? "");
 $no_exterior = trim($_POST["no_exterior"] ?? "");
 $no_interior = trim($_POST["no_interior"] ?? "");
@@ -76,13 +78,22 @@ if (isset($_FILES["evidencia"]) && $_FILES["evidencia"]["error"] === UPLOAD_ERR_
         exit;
     }
 
+    $mimePermitidos = ["image/jpeg", "image/png", "image/webp"];
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mimeReal = $finfo->file($_FILES["evidencia"]["tmp_name"]);
+
+    if (!in_array($mimeReal, $mimePermitidos, true)) {
+        header("Location: queja.php?error=1");
+        exit;
+    }
+
     $uploadDir = __DIR__ . "/uploads";
 
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0755, true);
     }
 
-    $nombreArchivo = uniqid("queja_", true) . "." . $ext;
+    $nombreArchivo = bin2hex(random_bytes(16)) . "." . $ext;
     $destino = $uploadDir . "/" . $nombreArchivo;
 
     if (!move_uploaded_file($_FILES["evidencia"]["tmp_name"], $destino)) {
@@ -104,7 +115,6 @@ try {
                 celular_1,
                 celular_2,
                 correo,
-                seccion_electoral,
                 calle,
                 no_exterior,
                 no_interior,
@@ -122,7 +132,6 @@ try {
                 :celular_1,
                 :celular_2,
                 :correo,
-                :seccion_electoral,
                 :calle,
                 :no_exterior,
                 :no_interior,
@@ -144,7 +153,6 @@ try {
         ":celular_1" => $celular_1,
         ":celular_2" => $celular_2,
         ":correo" => $correo,
-        ":seccion_electoral" => $seccion_electoral,
         ":calle" => $calle,
         ":no_exterior" => $no_exterior,
         ":no_interior" => $no_interior,

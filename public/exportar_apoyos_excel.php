@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "includes/session.php";
 require_once "db.php";
 
 if (!isset($_SESSION["empleado_id"])) {
@@ -7,7 +7,7 @@ if (!isset($_SESSION["empleado_id"])) {
     exit;
 }
 
-$sql = "SELECT id, apoyo, nombre, apellido_paterno, apellido_materno, celular_1, celular_2, correo,seccion_electoral, calle, no_exterior, no_interior,colonia, municipio, codigo_postal, observaciones, estatus, created_at
+$sql = "SELECT id, apoyo, nombre, apellido_paterno, apellido_materno, celular_1, celular_2, correo, calle, no_exterior, no_interior, colonia, municipio, codigo_postal, observaciones, estatus, created_at
         FROM registros_apoyos
         ORDER BY created_at DESC";
 $stmt = $pdo->query($sql);
@@ -27,7 +27,6 @@ fputcsv($output, [
     'Celular_1',
     'Celular_2',
     'Correo',
-    'Seccion_Electoral',
     'Calle',
     'No_Exterior',
     'No_Interior',
@@ -49,7 +48,6 @@ foreach ($registros as $r) {
         $r['celular_1'],
          $r['celular_2'],
         $r['correo'],
-        $r['seccion_electoral'],
         $r['calle'],
         $r['no_exterior'],
         $r['no_interior'],

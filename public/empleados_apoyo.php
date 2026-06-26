@@ -46,8 +46,7 @@ if ($buscar !== "") {
             celular_1        ILIKE :buscar OR
             celular_2        ILIKE :buscar OR
             municipio        ILIKE :buscar OR
-            colonia          ILIKE :buscar OR
-            seccion_electoral ILIKE :buscar
+            colonia          ILIKE :buscar
         )
     ";
     $paramsBusqueda[":buscar"] = "%$buscar%";
@@ -81,7 +80,7 @@ $apoyosActivos = $pdo->query($sqlApoyos)->fetchAll(PDO::FETCH_ASSOC) ?: [];
 ========================================= */
 $sqlRegistrosApoyos = "
     SELECT id, apoyo, nombre, apellido_paterno, apellido_materno,
-           celular_1, celular_2, correo, seccion_electoral,
+           celular_1, celular_2, correo,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
            observaciones, estatus, created_at, ine_path
     FROM registros_apoyos
@@ -504,11 +503,6 @@ $totalApoyosTipo = count($apoyosActivos);
             </div>
             <?php endif; ?>
 
-            <?php if (!empty($r["seccion_electoral"])): ?>
-            <div style="margin-top:4px;color:#6b7280;font-size:13px;">
-              🗳 Sección electoral: <?php echo htmlspecialchars($r["seccion_electoral"]); ?>
-            </div>
-            <?php endif; ?>
 
             <?php
               $dir = trim(

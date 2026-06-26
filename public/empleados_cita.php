@@ -45,8 +45,7 @@ if ($buscar !== "") {
             celular_1 ILIKE :buscar OR
             celular_2 ILIKE :buscar OR
             municipio ILIKE :buscar OR
-            colonia ILIKE :buscar OR
-            seccion_electoral ILIKE :buscar
+            colonia ILIKE :buscar
         )
     ";
     $paramsBusqueda[":buscar"] = "%$buscar%";
@@ -92,7 +91,7 @@ $bloqueos = $stmtBloq ? $stmtBloq->fetchAll(PDO::FETCH_ASSOC) : [];
 ========================================= */
 $sqlSolicitudes = "
     SELECT id, nombre, apellido_paterno, apellido_materno,
-           celular_1, celular_2, correo, seccion_electoral,
+           celular_1, celular_2, correo,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
            fecha, hora, motivo, ine_path, estatus, created_at
     FROM citas
@@ -110,7 +109,7 @@ $solicitudesCita = $stmtSolicitudes->fetchAll(PDO::FETCH_ASSOC) ?: [];
 ========================================= */
 $sqlCitasAceptadas = "
     SELECT id, nombre, apellido_paterno, apellido_materno,
-           celular_1, celular_2, correo, seccion_electoral,
+           celular_1, celular_2, correo,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
            fecha, hora, motivo, ine_path, estatus, created_at
     FROM citas
@@ -128,7 +127,7 @@ $citasAceptadas = $stmtCitasAceptadas->fetchAll(PDO::FETCH_ASSOC) ?: [];
 ========================================= */
 $sqlHistorialCitas = "
     SELECT id, nombre, apellido_paterno, apellido_materno,
-           celular_1, celular_2, correo, seccion_electoral,
+           celular_1, celular_2, correo,
            calle, no_exterior, no_interior, colonia, municipio, codigo_postal,
            fecha, hora, motivo, ine_path, estatus, created_at
     FROM citas

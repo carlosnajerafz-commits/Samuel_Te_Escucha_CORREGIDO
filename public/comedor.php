@@ -50,6 +50,7 @@ if (isset($_GET["error"])) {
     $mostrarModal = true;
     $modalTitulo  = "Error";
     $modalMensaje = match($_GET["error"]) {
+        "limite"   => "Ya enviaste 3 registros al comedor en la última hora. Por favor espera un momento antes de intentar de nuevo.",
         "celular"  => "El número de celular debe tener exactamente 10 dígitos.",
         "evento"   => "El evento seleccionado no existe o ya no está disponible.",
         "cupo"     => "Lo sentimos, el evento ya alcanzó su cupo máximo.",
@@ -288,10 +289,6 @@ $diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sába
             <input type="email" name="correo">
           </div>
 
-          <div class="form-group">
-            <label>Sección electoral (opcional)</label>
-            <input type="text" name="seccion_electoral" maxlength="10" placeholder="Ej: 1234">
-          </div>
           <div class="form-group half">
             <label>Calle</label>
             <input type="text" name="calle" required>

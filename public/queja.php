@@ -19,7 +19,9 @@ if (isset($_GET["ok"])) {
 if (isset($_GET["error"])) {
     $mostrarModal = true;
     $modalTitulo  = "Error";
-    $modalMensaje = "No fue posible registrar la queja. Verifica los datos e inténtalo de nuevo.";
+    $modalMensaje = $_GET["error"] === "limite"
+        ? "Ya enviaste 3 quejas en la última hora. Por favor espera un momento antes de intentar de nuevo."
+        : "No fue posible registrar la queja. Verifica los datos e inténtalo de nuevo.";
     $modalTipo    = "error";
 }
 // Verificar modo mantenimiento

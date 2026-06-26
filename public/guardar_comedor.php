@@ -1,10 +1,13 @@
 <?php
 require_once "db.php";
+require_once "includes/rate_limit.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: comedor.php");
     exit;
 }
+
+rate_limit_or_redirect($pdo, 'comedor', 3, 3600, 'comedor.php?error=limite');
 
 $eventoId      = (int)($_POST["evento_id"] ?? 0);
 $nombre        = trim($_POST["nombre"] ?? "");
@@ -13,7 +16,6 @@ $apellidoMat   = trim($_POST["apellido_materno"] ?? "");
 $celular1      = preg_replace("/\D/", "", $_POST["celular_1"] ?? "");
 $celular2      = preg_replace("/\D/", "", $_POST["celular_2"] ?? "");
 $correo        = trim($_POST["correo"] ?? "");
-$seccion       = trim($_POST["seccion_electoral"] ?? "");
 $calle         = trim($_POST["calle"] ?? "");
 $noExterior    = trim($_POST["no_exterior"] ?? "");
 $noInterior    = trim($_POST["no_interior"] ?? "");
@@ -76,13 +78,13 @@ $stmt = $pdo->prepare("
     INSERT INTO registros_comedor
         (evento_id, nombre, apellido_paterno, apellido_materno,
          celular_1, celular_2, correo,
-         seccion_electoral, calle, no_exterior, no_interior,
+         calle, no_exterior, no_interior,
          colonia, municipio, codigo_postal,
          numero_personas, observaciones, estatus)
     VALUES
         (:evento_id, :nombre, :apellido_paterno, :apellido_materno,
          :celular_1, :celular_2, :correo,
-         :seccion_electoral, :calle, :no_exterior, :no_interior,
+         :calle, :no_exterior, :no_interior,
          :colonia, :municipio, :codigo_postal,
          :numero_personas, :observaciones, 'pendiente')
 ");
@@ -95,7 +97,6 @@ $stmt->execute([
     ":celular_1"         => $celular1,
     ":celular_2"         => $celular2,
     ":correo"            => $correo,
-    ":seccion_electoral" => $seccion,
     ":calle"             => $calle,
     ":no_exterior"       => $noExterior,
     ":no_interior"       => $noInterior,

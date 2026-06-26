@@ -54,12 +54,6 @@ $badgeClass = "badge--" . $estatus;
     </div>
   <?php endif; ?>
 
-  <?php if (!empty($item["seccion_electoral"])): ?>
-    <div style="margin-top:4px;color:#6b7280;font-size:13px;">
-      🗳️ Sección: <?php echo htmlspecialchars($item["seccion_electoral"]); ?>
-    </div>
-  <?php endif; ?>
-
   <?php if (!empty($item["motivo"])): ?>
     <div style="margin-top:4px;color:#6b7280;font-size:13px;">
       📝 Motivo: <?php echo htmlspecialchars($item["motivo"]); ?>
