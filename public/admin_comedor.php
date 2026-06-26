@@ -7,6 +7,12 @@ if (!isset($_SESSION["empleado_id"])) {
     exit;
 }
 
+// Auto-migración: columnas tipo_comedor y grupo_dirigido
+try {
+    $pdo->exec("ALTER TABLE eventos_comedor ADD COLUMN IF NOT EXISTS tipo_comedor VARCHAR(100) DEFAULT ''");
+    $pdo->exec("ALTER TABLE eventos_comedor ADD COLUMN IF NOT EXISTS grupo_dirigido VARCHAR(150) DEFAULT ''");
+} catch (PDOException $e) { /* ignorar */ }
+
 $mensaje = "";
 $error   = "";
 
@@ -27,6 +33,8 @@ elseif (isset($_GET["error"])) {
 $proximosEventos = $pdo->query("
     SELECT e.id, e.fecha, e.hora_inicio, e.hora_fin, e.lugar, e.descripcion,
            e.cupo_maximo, e.activo,
+           COALESCE(e.tipo_comedor, '') AS tipo_comedor,
+           COALESCE(e.grupo_dirigido, '') AS grupo_dirigido,
            COALESCE(SUM(r.numero_personas), 0) AS personas_registradas,
            COUNT(r.id) AS registros_count
     FROM eventos_comedor e
@@ -40,6 +48,8 @@ $proximosEventos = $pdo->query("
 $eventosHistorial = $pdo->query("
     SELECT e.id, e.fecha, e.hora_inicio, e.hora_fin, e.lugar, e.descripcion,
            e.cupo_maximo, e.activo,
+           COALESCE(e.tipo_comedor, '') AS tipo_comedor,
+           COALESCE(e.grupo_dirigido, '') AS grupo_dirigido,
            COALESCE(SUM(r.numero_personas), 0) AS personas_registradas,
            COUNT(r.id) AS registros_count
     FROM eventos_comedor e
@@ -116,6 +126,39 @@ $eventosHistorial = $pdo->query("
       <div class="form-grid">
 
         <div class="form-group">
+          <label>Tipo de comedor</label>
+          <select name="tipo_comedor">
+            <option value="">— Seleccionar —</option>
+            <option value="Desayuno solidario">Desayuno solidario</option>
+            <option value="Comida solidaria">Comida solidaria</option>
+            <option value="Cena solidaria">Cena solidaria</option>
+            <option value="Comedor comunitario">Comedor comunitario</option>
+            <option value="Desayuno y comida">Desayuno y comida</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Dirigido a</label>
+          <select name="grupo_dirigido">
+            <option value="">— Seleccionar grupo —</option>
+            <option value="Adultos mayores">Adultos mayores</option>
+            <option value="Personas con discapacidad">Personas con discapacidad</option>
+            <option value="Madres solteras y jefas de familia">Madres solteras y jefas de familia</option>
+            <option value="Niñas, niños y adolescentes">Niñas, niños y adolescentes</option>
+            <option value="Personas en situación de pobreza">Personas en situación de pobreza</option>
+            <option value="Personas desempleadas">Personas desempleadas</option>
+            <option value="Personas en situación de calle">Personas en situación de calle</option>
+            <option value="Personas migrantes">Personas migrantes</option>
+            <option value="Personas cuidadoras sin ingresos suficientes">Personas cuidadoras sin ingresos suficientes</option>
+            <option value="Familias en situación de vulnerabilidad económica">Familias en situación de vulnerabilidad económica</option>
+            <option value="Personas con enfermedades que les impidan trabajar">Personas con enfermedades que les impidan trabajar</option>
+            <option value="Víctimas de violencia o desplazamiento">Víctimas de violencia o desplazamiento</option>
+            <option value="Comunidades indígenas en situación de marginación">Comunidades indígenas en situación de marginación</option>
+            <option value="Público en general">Público en general</option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label>Fecha del evento</label>
           <input type="date" name="fecha" required min="<?php echo date('Y-m-d'); ?>">
         </div>
@@ -188,6 +231,12 @@ $eventosHistorial = $pdo->query("
               <div class="evento-row__detail">🕐 <?php echo htmlspecialchars("$hI – $hF"); ?></div>
               <?php if (!empty($ev["lugar"])): ?>
                 <div class="evento-row__detail">📍 <?php echo htmlspecialchars($ev["lugar"]); ?></div>
+              <?php endif; ?>
+              <?php if (!empty($ev["tipo_comedor"])): ?>
+                <div class="evento-row__detail">🍽️ <?php echo htmlspecialchars($ev["tipo_comedor"]); ?></div>
+              <?php endif; ?>
+              <?php if (!empty($ev["grupo_dirigido"])): ?>
+                <div class="evento-row__detail">🏷️ Dirigido a: <strong><?php echo htmlspecialchars($ev["grupo_dirigido"]); ?></strong></div>
               <?php endif; ?>
               <div class="evento-row__detail">
                 👥 <?php echo $ocupado; ?> persona(s) registrada(s)

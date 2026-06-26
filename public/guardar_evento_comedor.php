@@ -12,12 +12,14 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-$fecha      = trim($_POST["fecha"] ?? "");
-$horaInicio = trim($_POST["hora_inicio"] ?? "");
-$horaFin    = trim($_POST["hora_fin"] ?? "");
-$lugar      = trim($_POST["lugar"] ?? "");
-$descripcion= trim($_POST["descripcion"] ?? "");
-$cupo       = (int)($_POST["cupo_maximo"] ?? 0);
+$fecha         = trim($_POST["fecha"] ?? "");
+$horaInicio    = trim($_POST["hora_inicio"] ?? "");
+$horaFin       = trim($_POST["hora_fin"] ?? "");
+$lugar         = trim($_POST["lugar"] ?? "");
+$descripcion   = trim($_POST["descripcion"] ?? "");
+$cupo          = (int)($_POST["cupo_maximo"] ?? 0);
+$tipoComedor   = trim($_POST["tipo_comedor"] ?? "");
+$grupoDirigido = trim($_POST["grupo_dirigido"] ?? "");
 
 if (empty($fecha)) {
     header("Location: admin_comedor.php?error=fecha");
@@ -35,17 +37,19 @@ if ($cupo < 0) {
 }
 
 $stmt = $pdo->prepare("
-    INSERT INTO eventos_comedor (fecha, hora_inicio, hora_fin, lugar, descripcion, cupo_maximo, activo)
-    VALUES (:fecha, :hora_inicio, :hora_fin, :lugar, :descripcion, :cupo, TRUE)
+    INSERT INTO eventos_comedor (fecha, hora_inicio, hora_fin, lugar, descripcion, cupo_maximo, tipo_comedor, grupo_dirigido, activo)
+    VALUES (:fecha, :hora_inicio, :hora_fin, :lugar, :descripcion, :cupo, :tipo_comedor, :grupo_dirigido, TRUE)
 ");
 
 $stmt->execute([
-    ":fecha"       => $fecha,
-    ":hora_inicio" => $horaInicio ?: "00:00",
-    ":hora_fin"    => $horaFin ?: "23:59",
-    ":lugar"       => $lugar,
-    ":descripcion" => $descripcion,
-    ":cupo"        => $cupo,
+    ":fecha"          => $fecha,
+    ":hora_inicio"    => $horaInicio ?: "00:00",
+    ":hora_fin"       => $horaFin ?: "23:59",
+    ":lugar"          => $lugar,
+    ":descripcion"    => $descripcion,
+    ":cupo"           => $cupo,
+    ":tipo_comedor"   => $tipoComedor,
+    ":grupo_dirigido" => $grupoDirigido,
 ]);
 
 header("Location: admin_comedor.php?ok=1");
