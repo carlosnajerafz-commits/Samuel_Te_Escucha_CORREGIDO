@@ -1,6 +1,9 @@
 <?php
-session_start();
+require_once "includes/session.php";
 require_once "db.php";
+require_once "includes/csrf.php";
+require_once "includes/helpers.php";
+csrf_validate('empleados_comedor.php');
 
 if (!isset($_SESSION["empleado_id"])) {
     header("Location: login.php");
@@ -19,23 +22,7 @@ try {
 $id        = (int)($_POST["id"] ?? 0);
 $categoria = trim($_POST["categoria_vulnerable"] ?? "");
 
-$categorias_permitidas = [
-    "Adultos mayores",
-    "Personas con discapacidad",
-    "Madres solteras y jefas de familia",
-    "Niñas, niños y adolescentes",
-    "Personas en situación de pobreza",
-    "Personas desempleadas",
-    "Personas en situación de calle",
-    "Personas migrantes",
-    "Personas cuidadoras sin ingresos suficientes",
-    "Familias en situación de vulnerabilidad económica",
-    "Personas con enfermedades que les impidan trabajar",
-    "Víctimas de violencia o desplazamiento",
-    "Comunidades indígenas en situación de marginación",
-];
-
-if ($id <= 0 || ($categoria !== "" && !in_array($categoria, $categorias_permitidas))) {
+if ($id <= 0 || ($categoria !== "" && !in_array($categoria, categoriasVulnerables(), true))) {
     header("Location: empleados_comedor.php");
     exit;
 }

@@ -22,6 +22,7 @@ $descripcion   = trim($_POST["descripcion"] ?? "");
 $cupo          = (int)($_POST["cupo_maximo"] ?? 0);
 $tipoComedor   = trim($_POST["tipo_comedor"] ?? "");
 $grupoDirigido = trim($_POST["grupo_dirigido"] ?? "");
+$menu          = trim($_POST["menu"] ?? "");
 
 if (empty($fecha)) {
     header("Location: admin_comedor.php?error=fecha");
@@ -39,8 +40,8 @@ if ($cupo < 0) {
 }
 
 $stmt = $pdo->prepare("
-    INSERT INTO eventos_comedor (fecha, hora_inicio, hora_fin, lugar, descripcion, cupo_maximo, tipo_comedor, grupo_dirigido, activo)
-    VALUES (:fecha, :hora_inicio, :hora_fin, :lugar, :descripcion, :cupo, :tipo_comedor, :grupo_dirigido, TRUE)
+    INSERT INTO eventos_comedor (fecha, hora_inicio, hora_fin, lugar, descripcion, cupo_maximo, tipo_comedor, grupo_dirigido, menu, activo)
+    VALUES (:fecha, :hora_inicio, :hora_fin, :lugar, :descripcion, :cupo, :tipo_comedor, :grupo_dirigido, :menu, TRUE)
 ");
 
 $stmt->execute([
@@ -52,6 +53,7 @@ $stmt->execute([
     ":cupo"           => $cupo,
     ":tipo_comedor"   => $tipoComedor,
     ":grupo_dirigido" => $grupoDirigido,
+    ":menu"           => $menu,
 ]);
 
 header("Location: admin_comedor.php?ok=1");

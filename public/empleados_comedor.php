@@ -4,6 +4,7 @@ require_once "includes/security_headers.php";
 require_once "includes/auth.php";
 require_once "includes/csrf.php";
 require_once "db.php";
+require_once "includes/helpers.php";
 
 require_auth();
 
@@ -164,6 +165,7 @@ function nombreCompleto(array $row): string {
       <a href="dashboard.php">Dashboard</a>
       <a href="empleados_comedor.php" style="color:#7A1737;font-weight:700;">Comedor</a>
       <a href="admin_comedor.php">Gestionar eventos</a>
+      <a href="comedor_estadisticas.php">Estadísticas</a>
       <a href="exportar_comedor_excel.php">Exportar</a>
       <a href="logout.php">Cerrar sesión</a>
     </nav>
@@ -296,22 +298,7 @@ function nombreCompleto(array $row): string {
           <select name="categoria_vulnerable" class="categoria-select">
             <option value="">— Sin categoría —</option>
             <?php
-              $categorias = [
-                "Adultos mayores",
-                "Personas con discapacidad",
-                "Madres solteras y jefas de familia",
-                "Niñas, niños y adolescentes",
-                "Personas en situación de pobreza",
-                "Personas desempleadas",
-                "Personas en situación de calle",
-                "Personas migrantes",
-                "Personas cuidadoras sin ingresos suficientes",
-                "Familias en situación de vulnerabilidad económica",
-                "Personas con enfermedades que les impidan trabajar",
-                "Víctimas de violencia o desplazamiento",
-                "Comunidades indígenas en situación de marginación",
-              ];
-              foreach ($categorias as $cat):
+              foreach (categoriasVulnerables() as $cat):
                 $sel = ($r["categoria_vulnerable"] ?? "") === $cat ? "selected" : "";
             ?>
               <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo $sel; ?>>

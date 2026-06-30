@@ -13,6 +13,7 @@ ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS codigo_postal VARCHAR(10)
 
 ALTER TABLE eventos_comedor ADD COLUMN IF NOT EXISTS tipo_comedor VARCHAR(100) DEFAULT '';
 ALTER TABLE eventos_comedor ADD COLUMN IF NOT EXISTS grupo_dirigido VARCHAR(150) DEFAULT '';
+ALTER TABLE eventos_comedor ADD COLUMN IF NOT EXISTS menu TEXT DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS eventos_comedor (
     id SERIAL PRIMARY KEY,
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS eventos_comedor (
     cupo_maximo INT DEFAULT 0,
     tipo_comedor VARCHAR(100) DEFAULT '',
     grupo_dirigido VARCHAR(150) DEFAULT '',
+    menu TEXT DEFAULT '',
     activo BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

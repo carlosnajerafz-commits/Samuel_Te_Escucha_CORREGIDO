@@ -2,6 +2,7 @@
 require_once __DIR__ . "/includes/security_headers.php";
 require_once __DIR__ . "/includes/session.php";
 require_once "db.php";
+require_once "includes/helpers.php";
 
 // Verificar modo mantenimiento
 if (file_exists(__DIR__ . "/maintenance.flag")) {
@@ -9,9 +10,14 @@ if (file_exists(__DIR__ . "/maintenance.flag")) {
     exit;
 }
 
+// Auto-migración defensiva: columna menu
+try {
+    $pdo->exec("ALTER TABLE eventos_comedor ADD COLUMN IF NOT EXISTS menu TEXT DEFAULT ''");
+} catch (PDOException $e) { /* ignorar */ }
+
 // Obtener próximos eventos activos
 $eventos = $pdo->query("
-    SELECT id, fecha, hora_inicio, hora_fin, lugar, descripcion, cupo_maximo
+    SELECT id, fecha, hora_inicio, hora_fin, lugar, descripcion, cupo_maximo, COALESCE(menu, '') AS menu
     FROM eventos_comedor
     WHERE activo = TRUE AND fecha >= CURRENT_DATE
     ORDER BY fecha ASC, hora_inicio ASC
@@ -55,6 +61,7 @@ if (isset($_GET["error"])) {
         "evento"   => "El evento seleccionado no existe o ya no está disponible.",
         "cupo"     => "Lo sentimos, el evento ya alcanzó su cupo máximo.",
         "personas" => "El número de personas debe ser entre 1 y 20.",
+        "categoria"=> "Selecciona el grupo vulnerable al que perteneces.",
         default    => "No fue posible registrarte. Verifica los datos e inténtalo de nuevo.",
     };
     $modalTipo = "error";
@@ -241,6 +248,9 @@ $diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sába
               <?php if (!empty($ev["descripcion"])): ?>
                 <div class="evento-card__desc"><?php echo htmlspecialchars($ev["descripcion"]); ?></div>
               <?php endif; ?>
+              <?php if (!empty($ev["menu"])): ?>
+                <div class="evento-card__desc">🍽️ Menú: <?php echo htmlspecialchars($ev["menu"]); ?></div>
+              <?php endif; ?>
               <?php if ($sinCupo): ?>
                 <span class="chip chip--lleno">Cupo lleno</span>
               <?php elseif ($disponibles !== null): ?>
@@ -324,6 +334,16 @@ $diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sába
           <div class="form-group">
             <label>Número de personas que asistirán</label>
             <input type="number" name="numero_personas" min="1" max="20" value="1" required>
+          </div>
+
+          <div class="form-group half">
+            <label>Grupo vulnerable al que perteneces</label>
+            <select name="categoria_vulnerable" required>
+              <option value="">Seleccione una opción</option>
+              <?php foreach (categoriasVulnerables() as $cat): ?>
+                <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?></option>
+              <?php endforeach; ?>
+            </select>
           </div>
 
           <div class="form-group half">

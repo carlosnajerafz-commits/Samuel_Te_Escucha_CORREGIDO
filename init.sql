@@ -119,6 +119,9 @@ CREATE TABLE eventos_comedor (
     lugar VARCHAR(255) DEFAULT '',
     descripcion TEXT DEFAULT '',
     cupo_maximo INT DEFAULT 0,
+    tipo_comedor VARCHAR(100) DEFAULT '',
+    grupo_dirigido VARCHAR(150) DEFAULT '',
+    menu TEXT DEFAULT '',
     activo BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -142,6 +145,7 @@ CREATE TABLE registros_comedor (
     municipio VARCHAR(150) DEFAULT '',
     codigo_postal VARCHAR(10) DEFAULT '',
     numero_personas INT DEFAULT 1,
+    categoria_vulnerable VARCHAR(150) DEFAULT '',
     observaciones TEXT DEFAULT '',
     estatus VARCHAR(20) NOT NULL DEFAULT 'pendiente',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

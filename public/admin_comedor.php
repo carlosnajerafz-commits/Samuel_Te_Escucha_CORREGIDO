@@ -3,16 +3,18 @@ require_once "includes/session.php";
 require_once "db.php";
 require_once "includes/security_headers.php";
 require_once "includes/csrf.php";
+require_once "includes/helpers.php";
 
 if (!isset($_SESSION["empleado_id"])) {
     header("Location: login.php");
     exit;
 }
 
-// Auto-migración: columnas tipo_comedor y grupo_dirigido
+// Auto-migración: columnas tipo_comedor, grupo_dirigido y menu
 try {
     $pdo->exec("ALTER TABLE eventos_comedor ADD COLUMN IF NOT EXISTS tipo_comedor VARCHAR(100) DEFAULT ''");
     $pdo->exec("ALTER TABLE eventos_comedor ADD COLUMN IF NOT EXISTS grupo_dirigido VARCHAR(150) DEFAULT ''");
+    $pdo->exec("ALTER TABLE eventos_comedor ADD COLUMN IF NOT EXISTS menu TEXT DEFAULT ''");
 } catch (PDOException $e) { /* ignorar */ }
 
 $mensaje = "";
@@ -22,6 +24,7 @@ if (isset($_GET["ok"]))                $mensaje = "Evento creado correctamente."
 elseif (isset($_GET["eliminado"]))     $mensaje = "Evento eliminado correctamente.";
 elseif (isset($_GET["desactivado"]))   $mensaje = "Evento desactivado.";
 elseif (isset($_GET["activado"]))      $mensaje = "Evento activado.";
+elseif (isset($_GET["menu_ok"]))       $mensaje = "Menú actualizado correctamente.";
 elseif (isset($_GET["error"])) {
     $error = match($_GET["error"]) {
         "fecha"   => "La fecha es obligatoria.",
@@ -37,6 +40,7 @@ $proximosEventos = $pdo->query("
            e.cupo_maximo, e.activo,
            COALESCE(e.tipo_comedor, '') AS tipo_comedor,
            COALESCE(e.grupo_dirigido, '') AS grupo_dirigido,
+           COALESCE(e.menu, '') AS menu,
            COALESCE(SUM(r.numero_personas), 0) AS personas_registradas,
            COUNT(r.id) AS registros_count
     FROM eventos_comedor e
@@ -52,6 +56,7 @@ $eventosHistorial = $pdo->query("
            e.cupo_maximo, e.activo,
            COALESCE(e.tipo_comedor, '') AS tipo_comedor,
            COALESCE(e.grupo_dirigido, '') AS grupo_dirigido,
+           COALESCE(e.menu, '') AS menu,
            COALESCE(SUM(r.numero_personas), 0) AS personas_registradas,
            COUNT(r.id) AS registros_count
     FROM eventos_comedor e
@@ -84,6 +89,12 @@ $eventosHistorial = $pdo->query("
     .badge-inactivo { background:#f3f4f6; color:#6b7280; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:700; }
     .alert-success { background:#dcfce7; color:#166534; border:1px solid #86efac; border-radius:10px; padding:12px 18px; margin-bottom:20px; font-weight:600; }
     .alert-error   { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; border-radius:10px; padding:12px 18px; margin-bottom:20px; font-weight:600; }
+    .menu-row { display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap; width:100%; }
+    .menu-row label { font-size:12px; font-weight:700; color:#374151; white-space:nowrap; }
+    .menu-row input[type="text"] { flex:1; min-width:220px; border:1px solid #d1d5db; border-radius:8px; padding:5px 10px; font-size:12px; color:#374151; background:#fff; }
+    .menu-row input[type="text"]:focus { outline:none; border-color:#7A1737; box-shadow:0 0 0 3px rgba(122,23,55,.08); }
+    .btn-menu { background:#7A1737; color:#fff; border:none; border-radius:8px; padding:5px 14px; font-size:12px; font-weight:700; cursor:pointer; }
+    .btn-menu:hover { opacity:.85; }
   </style>
 </head>
 <body>
@@ -103,6 +114,7 @@ $eventosHistorial = $pdo->query("
       <a href="dashboard.php">Dashboard</a>
       <a href="empleados_comedor.php">Registros</a>
       <a href="admin_comedor.php" style="color:#7A1737;font-weight:700;">Comedor</a>
+      <a href="comedor_estadisticas.php">Estadísticas</a>
       <a href="logout.php">Cerrar sesión</a>
     </nav>
   </div>
@@ -144,20 +156,9 @@ $eventosHistorial = $pdo->query("
           <label>Dirigido a</label>
           <select name="grupo_dirigido">
             <option value="">— Seleccionar grupo —</option>
-            <option value="Adultos mayores">Adultos mayores</option>
-            <option value="Personas con discapacidad">Personas con discapacidad</option>
-            <option value="Madres solteras y jefas de familia">Madres solteras y jefas de familia</option>
-            <option value="Niñas, niños y adolescentes">Niñas, niños y adolescentes</option>
-            <option value="Personas en situación de pobreza">Personas en situación de pobreza</option>
-            <option value="Personas desempleadas">Personas desempleadas</option>
-            <option value="Personas en situación de calle">Personas en situación de calle</option>
-            <option value="Personas migrantes">Personas migrantes</option>
-            <option value="Personas cuidadoras sin ingresos suficientes">Personas cuidadoras sin ingresos suficientes</option>
-            <option value="Familias en situación de vulnerabilidad económica">Familias en situación de vulnerabilidad económica</option>
-            <option value="Personas con enfermedades que les impidan trabajar">Personas con enfermedades que les impidan trabajar</option>
-            <option value="Víctimas de violencia o desplazamiento">Víctimas de violencia o desplazamiento</option>
-            <option value="Comunidades indígenas en situación de marginación">Comunidades indígenas en situación de marginación</option>
-            <option value="Público en general">Público en general</option>
+            <?php foreach (categoriasVulnerables(true) as $cat): ?>
+              <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?></option>
+            <?php endforeach; ?>
           </select>
         </div>
 
@@ -189,6 +190,11 @@ $eventosHistorial = $pdo->query("
         <div class="form-group form-group--full">
           <label>Descripción del evento</label>
           <textarea name="descripcion" maxlength="500" placeholder="Información adicional sobre el evento..."></textarea>
+        </div>
+
+        <div class="form-group form-group--full">
+          <label>Menú — ¿qué se va a servir?</label>
+          <textarea name="menu" maxlength="500" placeholder="Ej: Arroz, pollo guisado, frijoles y agua de fruta..."></textarea>
         </div>
 
       </div>
@@ -249,6 +255,17 @@ $eventosHistorial = $pdo->query("
                 &nbsp;·&nbsp;
                 <?php echo (int)$ev["registros_count"]; ?> solicitud(es)
               </div>
+              <?php if (!empty($ev["menu"])): ?>
+                <div class="evento-row__detail">🍽️ Menú: <?php echo htmlspecialchars($ev["menu"]); ?></div>
+              <?php endif; ?>
+              <form method="POST" action="actualizar_menu_comedor.php" class="menu-row">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="id" value="<?php echo (int)$ev["id"]; ?>">
+                <label>Menú:</label>
+                <input type="text" name="menu" maxlength="500" placeholder="¿Qué se va a servir?"
+                       value="<?php echo htmlspecialchars($ev["menu"]); ?>">
+                <button type="submit" class="btn-menu">Guardar</button>
+              </form>
             </div>
             <div class="evento-row__actions">
               <a href="empleados_comedor.php?evento=<?php echo (int)$ev["id"]; ?>"
@@ -302,6 +319,9 @@ $eventosHistorial = $pdo->query("
             <div class="evento-row__detail">
               👥 <?php echo (int)$ev["personas_registradas"]; ?> persona(s) · <?php echo (int)$ev["registros_count"]; ?> solicitud(es)
             </div>
+            <?php if (!empty($ev["menu"])): ?>
+              <div class="evento-row__detail">🍽️ Menú: <?php echo htmlspecialchars($ev["menu"]); ?></div>
+            <?php endif; ?>
           </div>
           <div class="evento-row__actions">
             <a href="empleados_comedor.php?evento=<?php echo (int)$ev["id"]; ?>"

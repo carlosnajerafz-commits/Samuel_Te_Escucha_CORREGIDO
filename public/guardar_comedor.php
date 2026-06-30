@@ -1,6 +1,7 @@
 <?php
 require_once "db.php";
 require_once "includes/rate_limit.php";
+require_once "includes/helpers.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: comedor.php");
@@ -8,6 +9,10 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 rate_limit_or_redirect($pdo, 'comedor', 3, 3600, 'comedor.php?error=limite');
+
+try {
+    $pdo->exec("ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS categoria_vulnerable VARCHAR(150) DEFAULT ''");
+} catch (PDOException $e) { /* ignorar */ }
 
 $eventoId      = (int)($_POST["evento_id"] ?? 0);
 $nombre        = trim($_POST["nombre"] ?? "");
@@ -23,11 +28,17 @@ $colonia       = trim($_POST["colonia"] ?? "");
 $municipio     = trim($_POST["municipio"] ?? "");
 $cp            = preg_replace("/\D/", "", $_POST["codigo_postal"] ?? "");
 $numPersonas   = (int)($_POST["numero_personas"] ?? 1);
+$categoria     = trim($_POST["categoria_vulnerable"] ?? "");
 $observaciones = trim($_POST["observaciones"] ?? "");
 
 // Validaciones
 if ($eventoId <= 0) {
     header("Location: comedor.php?error=evento");
+    exit;
+}
+
+if (!in_array($categoria, categoriasVulnerables(), true)) {
+    header("Location: comedor.php?error=categoria&evento=$eventoId");
     exit;
 }
 
@@ -80,31 +91,32 @@ $stmt = $pdo->prepare("
          celular_1, celular_2, correo,
          calle, no_exterior, no_interior,
          colonia, municipio, codigo_postal,
-         numero_personas, observaciones, estatus)
+         numero_personas, categoria_vulnerable, observaciones, estatus)
     VALUES
         (:evento_id, :nombre, :apellido_paterno, :apellido_materno,
          :celular_1, :celular_2, :correo,
          :calle, :no_exterior, :no_interior,
          :colonia, :municipio, :codigo_postal,
-         :numero_personas, :observaciones, 'pendiente')
+         :numero_personas, :categoria_vulnerable, :observaciones, 'pendiente')
 ");
 
 $stmt->execute([
-    ":evento_id"         => $eventoId,
-    ":nombre"            => $nombre,
-    ":apellido_paterno"  => $apellidoPat,
-    ":apellido_materno"  => $apellidoMat,
-    ":celular_1"         => $celular1,
-    ":celular_2"         => $celular2,
-    ":correo"            => $correo,
-    ":calle"             => $calle,
-    ":no_exterior"       => $noExterior,
-    ":no_interior"       => $noInterior,
-    ":colonia"           => $colonia,
-    ":municipio"         => $municipio,
-    ":codigo_postal"     => $cp,
-    ":numero_personas"   => $numPersonas,
-    ":observaciones"     => $observaciones,
+    ":evento_id"            => $eventoId,
+    ":nombre"               => $nombre,
+    ":apellido_paterno"     => $apellidoPat,
+    ":apellido_materno"     => $apellidoMat,
+    ":celular_1"            => $celular1,
+    ":celular_2"            => $celular2,
+    ":correo"               => $correo,
+    ":calle"                => $calle,
+    ":no_exterior"          => $noExterior,
+    ":no_interior"          => $noInterior,
+    ":colonia"              => $colonia,
+    ":municipio"            => $municipio,
+    ":codigo_postal"        => $cp,
+    ":numero_personas"      => $numPersonas,
+    ":categoria_vulnerable" => $categoria,
+    ":observaciones"        => $observaciones,
 ]);
 
 $id = $pdo->lastInsertId();

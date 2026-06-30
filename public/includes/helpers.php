@@ -56,3 +56,32 @@ function fechaDisplay(?string $fecha): string
     $ts = strtotime($fecha);
     return $ts ? date('d/m/Y', $ts) : $fecha;
 }
+
+/**
+ * Lista de grupos vulnerables del Comedor Solidario.
+ * Compartida entre el registro público y los paneles de personal/admin.
+ */
+function categoriasVulnerables(bool $incluirPublicoGeneral = false): array
+{
+    $categorias = [
+        "Adultos mayores",
+        "Personas con discapacidad",
+        "Madres solteras y jefas de familia",
+        "Niñas, niños y adolescentes",
+        "Personas en situación de pobreza",
+        "Personas desempleadas",
+        "Personas en situación de calle",
+        "Personas migrantes",
+        "Personas cuidadoras sin ingresos suficientes",
+        "Familias en situación de vulnerabilidad económica",
+        "Personas con enfermedades que les impidan trabajar",
+        "Víctimas de violencia o desplazamiento",
+        "Comunidades indígenas en situación de marginación",
+    ];
+
+    if ($incluirPublicoGeneral) {
+        $categorias[] = "Público en general";
+    }
+
+    return $categorias;
+}

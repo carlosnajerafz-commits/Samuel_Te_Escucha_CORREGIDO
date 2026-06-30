@@ -359,6 +359,7 @@ function direccion(array $row): string {
     <a href="exportar_apoyos_excel.php"><span class="ql-dot"></span> Exportar apoyos</a>
     <a href="empleados_comedor.php"><span class="ql-dot"></span> Comedor Solidario</a>
     <a href="admin_comedor.php"><span class="ql-dot"></span> + Eventos del comedor</a>
+    <a href="comedor_estadisticas.php"><span class="ql-dot"></span> Estadísticas del comedor</a>
   </div>
 
   <!-- ==============================
@@ -919,6 +920,7 @@ function direccion(array $row): string {
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <a href="admin_comedor.php" class="btn">+ Nuevo evento</a>
         <a href="empleados_comedor.php" class="section-link" style="align-self:center;">Ver registros →</a>
+        <a href="comedor_estadisticas.php" class="section-link" style="align-self:center;">Ver estadísticas →</a>
       </div>
     </div>
 
