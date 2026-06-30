@@ -89,10 +89,6 @@ $eventosLista = $pdo->query("
     FROM eventos_comedor
     ORDER BY fecha DESC
 ")->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-function nombreCompleto(array $row): string {
-    return trim(($row["nombre"] ?? "") . " " . ($row["apellido_paterno"] ?? "") . " " . ($row["apellido_materno"] ?? ""));
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
