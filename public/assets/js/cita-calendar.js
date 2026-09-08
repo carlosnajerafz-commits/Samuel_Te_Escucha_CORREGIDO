@@ -27,12 +27,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${diasLargos[date.getDay()]} ${date.getDate()} de ${meses[date.getMonth()]} de ${date.getFullYear()}`;
   }
 
-  function isPastDay(date) {
+  function isPastOrToday(date) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const compare = new Date(date);
     compare.setHours(0, 0, 0, 0);
-    return compare < today;
+    return compare <= today;
   }
 
   function isTuesday(date) {
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       button.type = "button";
       button.className = "calendar-day-ui";
 
-      const available = isTuesday(date) && !isPastDay(date);
+      const available = isTuesday(date) && !isPastOrToday(date);
 
       button.classList.add(available ? "enabled" : "disabled");
 

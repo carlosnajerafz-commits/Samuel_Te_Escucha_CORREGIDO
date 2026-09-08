@@ -1,10 +1,13 @@
 <?php
 require_once "db.php";
+require_once "includes/rate_limit.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: cita.php");
     exit;
 }
+
+rate_limit_or_redirect($pdo, 'cita', 3, 3600, 'cita.php?error=limite');
 
 $nombre           = trim($_POST["nombre"]           ?? "");
 $apellido_paterno = trim($_POST["apellido_paterno"] ?? "");
@@ -41,60 +44,77 @@ if (!preg_match('/^\d{10}$/', $celular_1) || !preg_match('/^\d{10}$/', $celular_
     exit;
 }
 
-$diaSemana = date("N", strtotime($fecha));
+$ts = strtotime($fecha);
+if ($ts === false || $ts <= 0) {
+    header("Location: cita.php?error=martes");
+    exit;
+}
+$diaSemana = date("N", $ts);
 if ($diaSemana != 2) {
     header("Location: cita.php?error=martes");
     exit;
 }
 
-/* Validar horario ocupado */
-$stmtVerificar = $pdo->prepare("
-    SELECT COUNT(*)
-    FROM citas
-    WHERE fecha = :fecha
-      AND hora  = :hora
-      AND estatus IN ('solicitada', 'aceptada')
-");
-$stmtVerificar->execute([":fecha" => $fecha, ":hora" => $hora]);
-
-if ((int)$stmtVerificar->fetchColumn() > 0) {
-    header("Location: cita.php?error=ocupada");
-    exit;
-}
-
-/* Validar día bloqueado (día completo) */
-$stmtBloqueoDia = $pdo->prepare("
-    SELECT COUNT(*)
-    FROM bloqueos_cita
-    WHERE fecha = :fecha
-      AND dia_completo = TRUE
-");
-$stmtBloqueoDia->execute([":fecha" => $fecha]);
-
-if ((int)$stmtBloqueoDia->fetchColumn() > 0) {
-    header("Location: cita.php?error=bloqueado");
-    exit;
-}
-
-/* Validar hora bloqueada */
-$stmtBloqueoHora = $pdo->prepare("
-    SELECT COUNT(*)
-    FROM bloqueos_cita
-    WHERE fecha = :fecha
-      AND hora = :hora
-      AND dia_completo = FALSE
-");
-$stmtBloqueoHora->execute([":fecha" => $fecha, ":hora" => $hora]);
-
-if ((int)$stmtBloqueoHora->fetchColumn() > 0) {
-    header("Location: cita.php?error=bloqueado");
+/* No se permite agendar citas el mismo día ni en fechas pasadas */
+if (date("Y-m-d", $ts) <= date("Y-m-d")) {
+    header("Location: cita.php?error=mismodia");
     exit;
 }
 
 /* =========================================
-   GUARDAR CITA
+   GUARDAR CITA (con transacción para evitar condición de carrera)
 ========================================= */
 try {
+    $pdo->beginTransaction();
+
+    /* Validar horario ocupado */
+    $stmtVerificar = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM citas
+        WHERE fecha = :fecha
+          AND hora  = :hora
+          AND estatus IN ('solicitada', 'aceptada')
+        FOR UPDATE
+    ");
+    $stmtVerificar->execute([":fecha" => $fecha, ":hora" => $hora]);
+
+    if ((int)$stmtVerificar->fetchColumn() > 0) {
+        $pdo->rollBack();
+        header("Location: cita.php?error=ocupada");
+        exit;
+    }
+
+    /* Validar día bloqueado (día completo) */
+    $stmtBloqueoDia = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM bloqueos_cita
+        WHERE fecha = :fecha
+          AND dia_completo = TRUE
+    ");
+    $stmtBloqueoDia->execute([":fecha" => $fecha]);
+
+    if ((int)$stmtBloqueoDia->fetchColumn() > 0) {
+        $pdo->rollBack();
+        header("Location: cita.php?error=bloqueado");
+        exit;
+    }
+
+    /* Validar hora bloqueada */
+    $stmtBloqueoHora = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM bloqueos_cita
+        WHERE fecha = :fecha
+          AND hora = :hora
+          AND dia_completo = FALSE
+    ");
+    $stmtBloqueoHora->execute([":fecha" => $fecha, ":hora" => $hora]);
+
+    if ((int)$stmtBloqueoHora->fetchColumn() > 0) {
+        $pdo->rollBack();
+        header("Location: cita.php?error=bloqueado");
+        exit;
+    }
+
     $sql = "
         INSERT INTO citas (
             nombre, apellido_paterno, apellido_materno,
@@ -129,10 +149,12 @@ try {
     ]);
 
     $id = $pdo->lastInsertId();
+    $pdo->commit();
     header("Location: cita.php?ok=1&id=" . $id);
     exit;
 
 } catch (PDOException $e) {
+    $pdo->rollBack();
     header("Location: cita.php?error=general");
     exit;
 }
