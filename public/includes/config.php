@@ -7,7 +7,9 @@
  */
 
 // Cargar .env solo si no estamos en Docker (Docker inyecta env vars directamente)
-$envFile = dirname(__DIR__) . '/.env';
+// config.php vive en public/includes/, así que hay que subir dos niveles
+// para llegar a la raíz del proyecto, donde está el .env real.
+$envFile = dirname(__DIR__, 2) . '/.env';
 if (file_exists($envFile)) {
     $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {

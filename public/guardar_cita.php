@@ -7,8 +7,6 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-rate_limit_or_redirect($pdo, 'cita', 3, 3600, 'cita.php?error=limite');
-
 $nombre           = trim($_POST["nombre"]           ?? "");
 $apellido_paterno = trim($_POST["apellido_paterno"] ?? "");
 $apellido_materno = trim($_POST["apellido_materno"] ?? "");
@@ -61,15 +59,22 @@ if (date("Y-m-d", $ts) <= date("Y-m-d")) {
     exit;
 }
 
+/* Rate limiting: se cuenta solo hasta aquí, una vez que la solicitud
+   pasó todas las validaciones de formato (evita bloquear a alguien
+   por simples errores de captura, como un teléfono mal escrito). */
+rate_limit_or_redirect($pdo, 'cita', 3, 3600, 'cita.php?error=limite');
+
 /* =========================================
    GUARDAR CITA (con transacción para evitar condición de carrera)
 ========================================= */
 try {
     $pdo->beginTransaction();
 
-    /* Validar horario ocupado */
+    /* Validar horario ocupado
+       (SELECT id ... FOR UPDATE, no SELECT COUNT(*) ... FOR UPDATE:
+       PostgreSQL no permite FOR UPDATE junto con funciones de agregación) */
     $stmtVerificar = $pdo->prepare("
-        SELECT COUNT(*)
+        SELECT id
         FROM citas
         WHERE fecha = :fecha
           AND hora  = :hora
@@ -78,7 +83,7 @@ try {
     ");
     $stmtVerificar->execute([":fecha" => $fecha, ":hora" => $hora]);
 
-    if ((int)$stmtVerificar->fetchColumn() > 0) {
+    if ($stmtVerificar->fetch() !== false) {
         $pdo->rollBack();
         header("Location: cita.php?error=ocupada");
         exit;
@@ -155,6 +160,7 @@ try {
 
 } catch (PDOException $e) {
     $pdo->rollBack();
+    error_log("Error al guardar cita: " . $e->getMessage());
     header("Location: cita.php?error=general");
     exit;
 }

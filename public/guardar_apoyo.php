@@ -1,5 +1,6 @@
 <?php
 require_once "db.php";
+require_once "includes/rate_limit.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: apoyos.php?error=1");
@@ -43,7 +44,8 @@ if ($colonia      === "") $faltantes[] = "colonia";
 if ($municipio    === "") $faltantes[] = "municipio";
 
 if (!empty($faltantes)) {
-    die("FALTAN ESTOS CAMPOS: " . implode(", ", $faltantes));
+    header("Location: apoyos.php?error=1");
+    exit;
 }
 
 if (!preg_match('/^[0-9]{10}$/', $celular_1) || !preg_match('/^[0-9]{10}$/', $celular_2)) {
@@ -52,12 +54,19 @@ if (!preg_match('/^[0-9]{10}$/', $celular_1) || !preg_match('/^[0-9]{10}$/', $ce
 }
 
 if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-    die("FALLO VALIDACION: correo no válido.");
+    header("Location: apoyos.php?error=1");
+    exit;
 }
 
 if (!preg_match('/^[0-9]{5}$/', $codigo_postal)) {
-    die("FALLO VALIDACION: código postal no válido.");
+    header("Location: apoyos.php?error=1");
+    exit;
 }
+
+/* Rate limiting: se cuenta solo hasta aquí, una vez que la solicitud
+   pasó todas las validaciones de formato (evita bloquear a alguien
+   por simples errores de captura). */
+rate_limit_or_redirect($pdo, 'apoyo', 3, 3600, 'apoyos.php?error=limite');
 
 /* =========================================
    GUARDAR EN BD
@@ -100,5 +109,7 @@ try {
     exit;
 
 } catch (PDOException $e) {
-    die("Error SQL en guardar_apoyo.php: " . $e->getMessage());
+    error_log("Error SQL en guardar_apoyo.php: " . $e->getMessage());
+    header("Location: apoyos.php?error=1");
+    exit;
 }

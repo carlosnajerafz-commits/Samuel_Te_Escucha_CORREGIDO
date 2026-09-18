@@ -46,7 +46,7 @@ CREATE TABLE quejas (
     celular_1 VARCHAR(15) NOT NULL,
     celular_2 VARCHAR(15) DEFAULT '',
     correo VARCHAR(150) NOT NULL,
-    seccion_electoral VARCHAR(10) NOT NULL,
+    seccion_electoral VARCHAR(10) DEFAULT '',
     calle VARCHAR(150) NOT NULL,
     no_exterior VARCHAR(20) NOT NULL,
     no_interior VARCHAR(20) DEFAULT '',

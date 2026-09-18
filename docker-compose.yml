@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
+    env_file:
+      - .env
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.samuel.rule=Host(`samuelteescucha.com`)"
@@ -16,10 +18,12 @@ services:
   db:
     image: postgres:16
     restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: tecamac
-      POSTGRES_USER: tecamac_user
-      POSTGRES_PASSWORD: tecamac_pass
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
 

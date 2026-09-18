@@ -8,8 +8,6 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-rate_limit_or_redirect($pdo, 'comedor', 3, 3600, 'comedor.php?error=limite');
-
 try {
     $pdo->exec("ALTER TABLE registros_comedor ADD COLUMN IF NOT EXISTS categoria_vulnerable VARCHAR(150) DEFAULT ''");
 } catch (PDOException $e) { /* ignorar */ }
@@ -56,6 +54,11 @@ if ($numPersonas < 1 || $numPersonas > 20) {
     header("Location: comedor.php?error=personas&evento=$eventoId");
     exit;
 }
+
+/* Rate limiting: se cuenta solo hasta aquí, una vez que la solicitud
+   pasó todas las validaciones de formato (evita bloquear a alguien
+   por simples errores de captura). */
+rate_limit_or_redirect($pdo, 'comedor', 3, 3600, 'comedor.php?error=limite');
 
 // Verificar que el evento exista y esté activo
 $stmtEvento = $pdo->prepare("

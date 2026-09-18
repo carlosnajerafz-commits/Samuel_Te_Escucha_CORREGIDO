@@ -7,8 +7,6 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-rate_limit_or_redirect($pdo, 'queja', 3, 3600, 'queja.php?error=limite');
-
 $nombre = trim($_POST["nombre"] ?? "");
 $apellido_paterno = trim($_POST["apellido_paterno"] ?? "");
 $apellido_materno = trim($_POST["apellido_materno"] ?? "");
@@ -59,6 +57,11 @@ if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
     header("Location: queja.php?error=1");
     exit;
 }
+
+/* Rate limiting: se cuenta solo hasta aquí, una vez que la solicitud
+   pasó todas las validaciones de formato (evita bloquear a alguien
+   por simples errores de captura). */
+rate_limit_or_redirect($pdo, 'queja', 3, 3600, 'queja.php?error=limite');
 
 $evidenciaPath = null;
 
@@ -171,6 +174,7 @@ header("Location: queja.php?ok=1&id=" . $id);
 exit;
 
 } catch (PDOException $e) {
+    error_log("Error al guardar queja: " . $e->getMessage());
     header("Location: queja.php?error=1");
     exit;
 }
