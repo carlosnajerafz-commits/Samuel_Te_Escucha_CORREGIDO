@@ -93,7 +93,8 @@ CREATE TABLE registros_apoyos (
 CREATE TABLE codigos_postales (
     id SERIAL PRIMARY KEY,
     codigo_postal VARCHAR(10) NOT NULL,
-    colonia VARCHAR(150) NOT NULL
+    colonia VARCHAR(150) NOT NULL,
+    municipio VARCHAR(150) DEFAULT ''
 );
 
 CREATE INDEX idx_codigos_postales_cp ON codigos_postales(codigo_postal);
