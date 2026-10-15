@@ -21,7 +21,7 @@ if (isset($_GET["error"])) {
     $modalTitulo  = "Error";
     $error        = $_GET["error"];
     $modalMensaje = match($error) {
-        "limite"         => "Ya registraste 3 solicitudes de cita en la última hora. Por favor espera un momento antes de intentar de nuevo.",
+        "limite"         => "Ya registraste 3 solicitudes de cita en los últimos 3 minutos. Espera un momento antes de intentar de nuevo.",
         "martes"         => "Solo se pueden solicitar citas para los martes.",
         "mismodia"       => "No se pueden agendar citas el mismo día. Selecciona el próximo martes disponible.",
         "ocupada"        => "Ya existe una cita en esa fecha y horario.",

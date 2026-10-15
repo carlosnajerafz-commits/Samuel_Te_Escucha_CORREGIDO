@@ -62,7 +62,7 @@ if (date("Y-m-d", $ts) <= date("Y-m-d")) {
 /* Rate limiting: se cuenta solo hasta aquí, una vez que la solicitud
    pasó todas las validaciones de formato (evita bloquear a alguien
    por simples errores de captura, como un teléfono mal escrito). */
-rate_limit_or_redirect($pdo, 'cita', 3, 3600, 'cita.php?error=limite');
+rate_limit_or_redirect($pdo, 'cita', 3, 180, 'cita.php?error=limite');
 
 /* =========================================
    GUARDAR CITA (con transacción para evitar condición de carrera)
